@@ -316,6 +316,96 @@
         .player-info p {
             color: #888;
         }
+
+        .build-order-view {
+            display: none;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #0f3460;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .game-header-left {
+            flex: 1;
+        }
+
+        .game-header-right {
+            text-align: right;
+        }
+
+        .matchup {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            justify-content: center;
+        }
+
+        .matchup-player {
+            text-align: center;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .matchup-vs {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .build-order-timeline {
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .build-order-item {
+            background: #0f3460;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid #667eea;
+        }
+
+        .build-order-item:nth-child(even) {
+            background: #16213e;
+        }
+
+        .build-order-time {
+            font-weight: bold;
+            color: #667eea;
+            min-width: 60px;
+        }
+
+        .build-order-action {
+            flex: 1;
+            padding: 0 1rem;
+        }
+
+        .build-order-count {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .warning {
+            background: #f39c12;
+            color: #1a1a2e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -326,13 +416,13 @@
     
     <div class="container">
         <!-- Input Section -->
-        <div class="input-section">
-            <h2 style="margin-bottom: 1rem;">Enter Your Player ID</h2>
-            
+        <div class="input-section" id="inputSection">
+            <h2 style="margin-bottom: 1rem;">Enter Your Player ID or Game URL</h2>
+
             <div class="input-group">
                 <div class="input-field">
-                    <label for="profileId">Steam ID or Profile ID</label>
-                    <input type="text" id="profileId" placeholder="e.g., 4635035" value="">
+                    <label for="profileId">Steam ID, Profile ID, or AoE4 World URL</label>
+                    <input type="text" id="profileId" placeholder="e.g., 4635035 or https://aoe4world.com/players/17689761/games/182257348?sig=..." value="">
                 </div>
                 
                 <div class="input-field" style="flex: 0.5;">
@@ -354,9 +444,11 @@
             </div>
             
             <p class="help-text">
-                💡 Find your Profile ID on <a href="https://aoe4world.com" target="_blank" style="color: #667eea;">AoE4 World</a> by searching your Steam name
+                💡 Find your Profile ID on <a href="https://aoe4world.com" target="_blank" style="color: #667eea;">AoE4 World</a> by searching your Steam name<br>
+                🔗 Or paste a game URL from AoE4 World to analyze a specific match
             </p>
-            
+
+            <div class="warning" id="warning"></div>
             <div class="error" id="error"></div>
             
             <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #0f3460;">
@@ -462,46 +554,381 @@
                 <h2>📚 Training Plan</h2>
                 <ul id="trainingList" style="padding-left: 1.5rem; line-height: 2;"></ul>
             </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-secondary" onclick="showInputSection()">← Back to Input</button>
+            </div>
+        </div>
+
+        <!-- Build Order View -->
+        <div class="build-order-view" id="buildOrderView">
+            <!-- Game Header -->
+            <div class="card">
+                <div class="game-header">
+                    <div class="game-header-left">
+                        <h3 id="bo-map">Map</h3>
+                        <p style="color: #888;"><span id="bo-duration">--:--</span> • <span id="bo-result">Result</span></p>
+                    </div>
+                    <div class="game-header-right">
+                        <p style="color: #888;">Game ID: <span id="bo-gameId">-</span></p>
+                    </div>
+                </div>
+
+                <!-- Matchup -->
+                <div class="matchup">
+                    <div class="matchup-player">
+                        <h3 id="bo-playerName">Player</h3>
+                        <p style="color: #667eea; font-size: 1.1rem;" id="bo-playerCiv">Civilization</p>
+                        <p style="color: #888;">Rating: <span id="bo-playerRating">-</span></p>
+                    </div>
+                    <div class="matchup-vs">VS</div>
+                    <div class="matchup-player">
+                        <h3 id="bo-opponentName">Opponent</h3>
+                        <p style="color: #e74c3c; font-size: 1.1rem;" id="bo-opponentCiv">Civilization</p>
+                        <p style="color: #888;">Rating: <span id="bo-opponentRating">-</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Age Up Timings -->
+            <div class="card">
+                <h2>⏱️ Age Up Timings</h2>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h3>Feudal Age</h3>
+                        <div class="value" id="bo-feudalTime">-</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Castle Age</h3>
+                        <div class="value" id="bo-castleTime">-</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Imperial Age</h3>
+                        <div class="value" id="bo-imperialTime">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Stats -->
+            <div class="card">
+                <h2>📊 Performance Stats</h2>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h3>APM</h3>
+                        <div class="value" id="bo-apm">-</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Villagers</h3>
+                        <div class="value" id="bo-villagers">-</div>
+                        <div class="sub">peak count</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Military</h3>
+                        <div class="value" id="bo-military">-</div>
+                        <div class="sub">units created</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Build Order Timeline -->
+            <div class="card">
+                <h2>📜 Build Order</h2>
+                <div class="build-order-timeline" id="buildOrderTimeline">
+                    <!-- Timeline items will be inserted here -->
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-secondary" onclick="showInputSection()">← Back to Input</button>
+            </div>
         </div>
     </div>
     
     <script>
         // Auto-detect API URL - works both with separate frontend server and integrated backend
-        const API_URL = window.location.port === '8000' || window.location.pathname.includes('/static/') 
+        const API_URL = window.location.port === '8000' || window.location.pathname.includes('/static/')
             ? ''  // Same origin (integrated mode)
             : 'http://localhost:8000';  // Separate frontend server
         let civChart = null;
-        
-        async function analyzePlayer() {
-            const profileId = document.getElementById('profileId').value.trim();
-            const gameMode = document.getElementById('gameMode').value;
-            const gameLimit = document.getElementById('gameLimit').value;
-            
-            if (!profileId) {
-                showError('Please enter a Steam ID or Profile ID');
-                return;
+
+        // Parse AoE4 World URL or plain ID
+        function parseAoE4WorldUrl(input) {
+            input = input.trim();
+
+            // URL patterns (handle optional player name like "17689761-flyeversheep")
+            const patterns = {
+                gameWithSig: /aoe4world\.com\/players\/(\d+)(?:-[^/]+)?\/games\/(\d+)\?sig=([a-f0-9]+)/i,
+                game: /aoe4world\.com\/players\/(\d+)(?:-[^/]+)?\/games\/(\d+)/i,
+                profile: /aoe4world\.com\/players\/(\d+)(?:-[^/]+)?/i,
+                plainId: /^(\d+)$/
+            };
+
+            // Check game URL with signature (priority)
+            let match = input.match(patterns.gameWithSig);
+            if (match) {
+                return {
+                    type: 'game',
+                    profileId: match[1],
+                    gameId: match[2],
+                    signature: match[3],
+                    hasSig: true
+                };
             }
-            
+
+            // Check game URL without signature
+            match = input.match(patterns.game);
+            if (match) {
+                return {
+                    type: 'game',
+                    profileId: match[1],
+                    gameId: match[2],
+                    signature: null,
+                    hasSig: false
+                };
+            }
+
+            // Check profile URL
+            match = input.match(patterns.profile);
+            if (match) {
+                return {
+                    type: 'profile',
+                    profileId: match[1]
+                };
+            }
+
+            // Check plain ID
+            match = input.match(patterns.plainId);
+            if (match) {
+                return {
+                    type: 'plain_id',
+                    profileId: match[1]
+                };
+            }
+
+            return {
+                type: 'invalid',
+                error: 'Invalid URL format. Please enter a valid AoE4 World URL or Profile ID.'
+            };
+        }
+
+        // Format seconds to MM:SS
+        function formatTime(seconds) {
+            if (!seconds && seconds !== 0) return '-';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Show warning message
+        function showWarning(message) {
+            const warningEl = document.getElementById('warning');
+            warningEl.textContent = '⚠️ ' + message;
+            warningEl.style.display = 'block';
+        }
+
+        // Hide warning message
+        function hideWarning() {
+            document.getElementById('warning').style.display = 'none';
+        }
+
+        // Show input section
+        function showInputSection() {
+            document.getElementById('inputSection').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('buildOrderView').style.display = 'none';
+        }
+
+        // Analyze game build order
+        async function analyzeGame(profileId, gameId, signature) {
             hideError();
+            hideWarning();
             document.getElementById('loading').style.display = 'block';
             document.getElementById('results').style.display = 'none';
-            
+            document.getElementById('buildOrderView').style.display = 'none';
+
             try {
-                const response = await fetch(
-                    `${API_URL}/api/player/${profileId}?leaderboard=${gameMode}&limit=${gameLimit}`
-                );
-                
+                const url = signature
+                    ? `${API_URL}/api/game/${profileId}/${gameId}?sig=${signature}`
+                    : `${API_URL}/api/game/${profileId}/${gameId}`;
+
+                const response = await fetch(url);
+
                 if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('Game not found or private. Make sure the URL includes the signature parameter.');
+                    }
                     const error = await response.json();
-                    throw new Error(error.detail || 'Failed to fetch player data');
+                    throw new Error(error.detail || 'Failed to fetch game data');
                 }
-                
+
                 const data = await response.json();
-                displayResults(data);
+                displayBuildOrderResults(data);
             } catch (error) {
                 showError(error.message);
-            } finally {
                 document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Display build order results
+        function displayBuildOrderResults(data) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('buildOrderView').style.display = 'block';
+
+            const game = data.game;
+            const player = data.player;
+            const opponent = data.opponent;
+            const timings = data.timings || {};
+            const buildOrder = data.build_order || [];
+
+            // Game header
+            document.getElementById('bo-map').textContent = game.map || 'Unknown Map';
+            document.getElementById('bo-duration').textContent = game.duration_formatted || formatTime(game.duration);
+            document.getElementById('bo-gameId').textContent = game.game_id || '-';
+
+            const resultEl = document.getElementById('bo-result');
+            if (player.result === 'win') {
+                resultEl.textContent = '✅ Victory';
+                resultEl.style.color = '#27ae60';
+            } else if (player.result === 'loss') {
+                resultEl.textContent = '❌ Defeat';
+                resultEl.style.color = '#e74c3c';
+            } else {
+                resultEl.textContent = player.result || 'Unknown';
+                resultEl.style.color = '#888';
+            }
+
+            // Matchup
+            document.getElementById('bo-playerName').textContent = player.name || 'Player';
+            document.getElementById('bo-playerCiv').textContent = player.civilization || '-';
+            document.getElementById('bo-playerRating').textContent = player.rating || '-';
+
+            document.getElementById('bo-opponentName').textContent = opponent.name || 'Opponent';
+            document.getElementById('bo-opponentCiv').textContent = opponent.civilization || '-';
+            document.getElementById('bo-opponentRating').textContent = opponent.rating || '-';
+
+            // Age timings
+            document.getElementById('bo-feudalTime').textContent =
+                timings.feudal_age?.formatted || formatTime(timings.feudal_age?.seconds) || '-';
+            document.getElementById('bo-castleTime').textContent =
+                timings.castle_age?.formatted || formatTime(timings.castle_age?.seconds) || '-';
+            document.getElementById('bo-imperialTime').textContent =
+                timings.imperial_age?.formatted || formatTime(timings.imperial_age?.seconds) || '-';
+
+            // Performance stats
+            document.getElementById('bo-apm').textContent = player.apm || '-';
+            document.getElementById('bo-villagers').textContent = player.villager_high || '-';
+            document.getElementById('bo-military').textContent = player.military_count || '-';
+
+            // Build order timeline
+            const timeline = document.getElementById('buildOrderTimeline');
+            if (buildOrder && buildOrder.length > 0) {
+                // Process build order items to create timeline entries
+                const timelineItems = [];
+
+                buildOrder.forEach(item => {
+                    const itemName = item.icon ? item.icon.split('/').pop().replace(/_/g, ' ') : item.type;
+
+                    // Add constructed events
+                    if (item.constructed && item.constructed.length > 0) {
+                        item.constructed.forEach(time => {
+                            timelineItems.push({
+                                time: time,
+                                action: `Started ${itemName}`,
+                                type: item.type
+                            });
+                        });
+                    }
+
+                    // Add finished events (units created, buildings completed)
+                    if (item.finished && item.finished.length > 0) {
+                        item.finished.forEach((time, index) => {
+                            timelineItems.push({
+                                time: time,
+                                action: `${itemName}`,
+                                count: item.finished.length > 1 ? `#${index + 1}` : '',
+                                type: item.type
+                            });
+                        });
+                    }
+                });
+
+                // Sort by time and limit to reasonable amount
+                timelineItems.sort((a, b) => a.time - b.time);
+                const displayItems = timelineItems.slice(0, 200); // Limit display
+
+                if (displayItems.length > 0) {
+                    timeline.innerHTML = displayItems.map(item => `
+                        <div class="build-order-item">
+                            <div class="build-order-time">${formatTime(item.time)}</div>
+                            <div class="build-order-action">${item.action}</div>
+                            <div class="build-order-count">${item.count || ''}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    timeline.innerHTML = '<p style="color: #888; text-align: center;">No build order events found</p>';
+                }
+            } else {
+                timeline.innerHTML = '<p style="color: #888; text-align: center;">No build order data available</p>';
+            }
+
+            // Scroll to results
+            document.getElementById('buildOrderView').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function analyzePlayer() {
+            const input = document.getElementById('profileId').value.trim();
+            const gameMode = document.getElementById('gameMode').value;
+            const gameLimit = document.getElementById('gameLimit').value;
+
+            if (!input) {
+                showError('Please enter a Profile ID or AoE4 World URL');
+                return;
+            }
+
+            hideError();
+            hideWarning();
+
+            // Parse input
+            const parsed = parseAoE4WorldUrl(input);
+
+            if (parsed.type === 'invalid') {
+                showError(parsed.error);
+                return;
+            }
+
+            // Route based on input type
+            if (parsed.type === 'game') {
+                // Show warning if no signature
+                if (!parsed.hasSig) {
+                    showWarning('This game URL does not include a signature. It may not work for private games.');
+                }
+                // Analyze specific game
+                await analyzeGame(parsed.profileId, parsed.gameId, parsed.signature);
+            } else if (parsed.type === 'profile' || parsed.type === 'plain_id') {
+                // Analyze player (existing functionality)
+                const profileId = parsed.profileId;
+
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('results').style.display = 'none';
+                document.getElementById('buildOrderView').style.display = 'none';
+
+                try {
+                    const response = await fetch(
+                        `${API_URL}/api/player/${profileId}?leaderboard=${gameMode}&limit=${gameLimit}`
+                    );
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.detail || 'Failed to fetch player data');
+                    }
+
+                    const data = await response.json();
+                    displayResults(data);
+                } catch (error) {
+                    showError(error.message);
+                } finally {
+                    document.getElementById('loading').style.display = 'none';
+                }
             }
         }
         
