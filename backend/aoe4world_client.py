@@ -3,11 +3,16 @@ AoE4 World API Client
 Fetches player data and match history from AoE4 World
 """
 import aiohttp
+import ssl
+import certifi
 from typing import Optional, List, Dict, Any
 from dataclasses import dataclass
 from datetime import datetime
 
 AOE4WORLD_API_BASE = "https://aoe4world.com/api/v0"
+
+# Create SSL context with proper certificate verification
+ssl_context = ssl.create_default_context(cafile=certifi.where())
 
 @dataclass
 class Player:
@@ -41,14 +46,18 @@ class AoE4WorldClient:
     
     def __init__(self):
         self.session: Optional[aiohttp.ClientSession] = None
+        # Create connector with proper SSL context
+        self.connector = aiohttp.TCPConnector(ssl=ssl_context)
     
     async def __aenter__(self):
-        self.session = aiohttp.ClientSession()
+        self.session = aiohttp.ClientSession(connector=self.connector)
         return self
     
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if self.session:
             await self.session.close()
+        if self.connector:
+            self.connector.close()
     
     async def get_player(self, profile_id: str) -> Optional[Dict[str, Any]]:
         """Get player profile by profile_id or steam_id"""
