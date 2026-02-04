@@ -29,17 +29,59 @@ class Game:
     duration: int  # seconds
     map: str
     kind: str  # rm_solo, rm_team, etc
-    
+
     # Player-specific data
     player_civ: str
     player_result: str  # win, loss
     player_rating: int
     player_rating_diff: int
-    
+
     # Opponent data
     opponent_name: str
     opponent_civ: str
     opponent_rating: int
+
+@dataclass
+class BuildOrderItem:
+    id: str
+    icon: str
+    pbgid: int
+    type: str  # Unit, Building, Age, Upgrade, Animal
+    finished: List[int]  # timestamps in seconds
+    constructed: List[int]
+    destroyed: List[int]
+
+@dataclass
+class GameSummary:
+    game_id: int
+    duration: int
+    map_name: str
+    win_reason: str
+
+    # Player data
+    player_name: str
+    player_civ: str
+    player_result: str
+    player_apm: int
+
+    # Build order
+    build_order: List[Dict[str, Any]]
+
+    # Age up timings
+    feudal_age_time: Optional[int]
+    castle_age_time: Optional[int]
+    imperial_age_time: Optional[int]
+
+    # Resources
+    total_resources_gathered: Dict[str, int]
+    total_resources_spent: Dict[str, int]
+
+    # Scores
+    final_score: Dict[str, int]
+
+    # Opponent
+    opponent_name: str
+    opponent_civ: str
 
 class AoE4WorldClient:
     """Client for AoE4 World API"""
@@ -68,8 +110,8 @@ class AoE4WorldClient:
             return None
     
     async def get_player_games(
-        self, 
-        profile_id: str, 
+        self,
+        profile_id: str,
         limit: int = 10,
         leaderboard: str = "rm_solo"
     ) -> List[Dict[str, Any]]:
@@ -79,7 +121,7 @@ class AoE4WorldClient:
             "limit": limit,
             "leaderboard": leaderboard
         }
-        
+
         async with self.session.get(url, params=params) as response:
             if response.status == 200:
                 data = await response.json()
@@ -91,6 +133,93 @@ class AoE4WorldClient:
                     return data.get("games", [])
                 return []
             return []
+
+    async def get_game_summary(
+        self,
+        profile_id: str,
+        game_id: str,
+        sig: Optional[str] = None
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Get detailed game summary including build order
+
+        Args:
+            profile_id: Player profile ID
+            game_id: Game ID to fetch
+            sig: Optional signature for authentication (required for private games)
+
+        Returns:
+            Dictionary with game summary data including build order, or None if not found
+        """
+        # Build URL - summary endpoint uses the web URL format
+        url = f"https://aoe4world.com/players/{profile_id}/games/{game_id}/summary"
+        params = {"camelize": "true"}
+        if sig:
+            params["sig"] = sig
+
+        async with self.session.get(url, params=params) as response:
+            if response.status == 200:
+                try:
+                    data = await response.json()
+                    print(f"DEBUG get_game_summary: Successfully fetched summary for game {game_id}")
+                    return data
+                except Exception as e:
+                    print(f"DEBUG get_game_summary: Error parsing JSON: {e}")
+                    return None
+            else:
+                print(f"DEBUG get_game_summary: HTTP {response.status} for game {game_id}")
+                return None
+
+    def parse_game_summary(self, summary_data: Dict[str, Any], profile_id: str) -> Optional[GameSummary]:
+        """Parse game summary data into GameSummary object"""
+        try:
+            if not summary_data or "players" not in summary_data:
+                return None
+
+            # Find the player's data
+            player_data = None
+            opponent_data = None
+
+            for player in summary_data["players"]:
+                if str(player.get("profileId")) == str(profile_id):
+                    player_data = player
+                else:
+                    opponent_data = player
+
+            if not player_data:
+                print(f"DEBUG parse_game_summary: Player {profile_id} not found in game data")
+                return None
+
+            # Extract age up timings from actions
+            actions = player_data.get("actions", {})
+            feudal_age_time = actions.get("feudalAge", [None])[0]
+            castle_age_time = actions.get("castleAge", [None])[0]
+            imperial_age_time = actions.get("imperialAge", [None])[0]
+
+            return GameSummary(
+                game_id=summary_data.get("gameId"),
+                duration=summary_data.get("duration", 0),
+                map_name=summary_data.get("mapName", "Unknown"),
+                win_reason=summary_data.get("winReason", "Unknown"),
+                player_name=player_data.get("name", "Unknown"),
+                player_civ=player_data.get("civilization", "Unknown"),
+                player_result=player_data.get("result", "unknown"),
+                player_apm=player_data.get("apm", 0),
+                build_order=player_data.get("buildOrder", []),
+                feudal_age_time=feudal_age_time,
+                castle_age_time=castle_age_time,
+                imperial_age_time=imperial_age_time,
+                total_resources_gathered=player_data.get("totalResourcesGathered", {}),
+                total_resources_spent=player_data.get("totalResourcesSpent", {}),
+                final_score=player_data.get("scores", {}),
+                opponent_name=opponent_data.get("name", "Unknown") if opponent_data else "Unknown",
+                opponent_civ=opponent_data.get("civilization", "Unknown") if opponent_data else "Unknown"
+            )
+        except Exception as e:
+            print(f"Error parsing game summary: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
     
     def parse_game(self, game_data: Dict, profile_id: str) -> Optional[Game]:
         """Parse game data and extract player-specific info"""
