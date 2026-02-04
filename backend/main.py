@@ -1,30 +1,30 @@
 """
 AoE IV AI Coach - Backend API
+Uses AoE4 World API to fetch player data and generate AI coaching reports
 """
 import os
 import json
-import tempfile
 from typing import Optional
 from datetime import datetime
 
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import openai
 
-from parser import AoE4ReplayParser
+from aoe4world_client import AoE4WorldClient
 
 # Config
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 if OPENAI_API_KEY:
     openai.api_key = OPENAI_API_KEY
 
-app = FastAPI(title="AoE IV AI Coach", version="0.1.0")
+app = FastAPI(title="AoE IV AI Coach", version="0.2.0")
 
 # CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify actual origins
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,104 +32,188 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "AoE IV AI Coach API", "version": "0.1.0"}
+    return {"message": "AoE IV AI Coach API", "version": "0.2.0", "data_source": "AoE4 World"}
 
-@app.post("/api/analyze")
-async def analyze_replay(file: UploadFile = File(...)):
+@app.get("/api/player/{profile_id}")
+async def get_player_analysis(
+    profile_id: str,
+    limit: int = Query(10, ge=1, le=50),
+    leaderboard: str = Query("rm_solo", regex="^(rm_solo|rm_team|qm_1v1|qm_2v2|qm_3v3|qm_4v4)$")
+):
     """
-    Upload and analyze an AoE IV replay file
+    Fetch player data and generate AI coaching analysis
+    
+    - profile_id: Steam ID or AoE4 World Profile ID
+    - limit: Number of recent games to analyze (1-50)
+    - leaderboard: Game mode to analyze
     """
-    # Validate file type
-    if not file.filename.endswith('.aoe2record'):
-        raise HTTPException(status_code=400, detail="File must be .aoe2record format")
-    
-    # Save uploaded file temporarily
-    with tempfile.NamedTemporaryFile(delete=False, suffix='.aoe2record') as tmp:
-        content = await file.read()
-        tmp.write(content)
-        tmp_path = tmp.name
-    
-    try:
-        # Parse replay
-        parser = AoE4ReplayParser(tmp_path)
-        parsed_data = parser.parse()
+    async with AoE4WorldClient() as client:
+        # Get player profile
+        player_data = await client.get_player(profile_id)
+        if not player_data:
+            raise HTTPException(status_code=404, detail="Player not found")
+        
+        # Get recent games
+        games_data = await client.get_player_games(profile_id, limit=limit, leaderboard=leaderboard)
+        
+        # Parse games
+        games = []
+        for game_data in games_data:
+            game = client.parse_game(game_data, profile_id)
+            if game:
+                games.append(game)
+        
+        # Analyze performance
+        analysis = client.analyze_performance(games)
         
         # Generate AI coaching report
-        coaching_report = await generate_coaching_report(parsed_data)
+        coaching_report = await generate_coaching_report(player_data, analysis, games)
         
         return {
             "success": True,
-            "filename": file.filename,
-            "game_info": parsed_data['game_info'],
-            "players": parsed_data['players'],
-            "summary": parsed_data['summary'],
+            "player": {
+                "profile_id": player_data.get("profile_id"),
+                "name": player_data.get("name"),
+                "steam_id": player_data.get("steam_id"),
+                "country": player_data.get("country"),
+                "avatar_url": player_data.get("avatar_url")
+            },
+            "analysis": analysis,
+            "recent_games": [
+                {
+                    "game_id": g.game_id,
+                    "map": g.map,
+                    "civilization": g.player_civ,
+                    "result": g.player_result,
+                    "rating": g.player_rating,
+                    "rating_diff": g.player_rating_diff,
+                    "opponent": {
+                        "name": g.opponent_name,
+                        "civilization": g.opponent_civ,
+                        "rating": g.opponent_rating
+                    },
+                    "duration": g.duration
+                }
+                for g in games[:5]  # Include last 5 games in detail
+            ],
             "coaching_report": coaching_report
         }
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
-    
-    finally:
-        # Cleanup temp file
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
 
-async def generate_coaching_report(game_data: dict) -> dict:
+async def generate_coaching_report(player_data: dict, analysis: dict, games: list) -> dict:
     """
     Generate AI-powered coaching report using OpenAI
     """
     if not OPENAI_API_KEY:
-        return {
-            "error": "OpenAI API key not configured",
-            "tips": ["API key needed for AI coaching features"]
-        }
+        # Return template report without AI
+        return generate_template_report(analysis)
     
-    # Prepare prompt for AI
-    game_summary = json.dumps(game_data['summary'], indent=2)
-    players_info = json.dumps([
-        {"name": p.name, "civ": p.civ} for p in game_data['players']
-    ])
+    # Prepare data for AI
+    player_name = player_data.get("name", "Player")
     
-    prompt = f"""You are an expert Age of Empires IV coach. Analyze this game and provide specific improvement tips.
+    prompt = f"""You are an expert Age of Empires IV coach analyzing a player's recent performance.
 
-Game Summary:
-{game_summary}
+Player: {player_name}
 
-Players:
-{players_info}
+Performance Summary:
+- Total Games: {analysis.get('total_games', 0)}
+- Win Rate: {analysis.get('win_rate', 0)}%
+- Current Rating: {analysis.get('current_rating', 0)}
+- Average Rating Change per game: {analysis.get('avg_rating_change', 0)}
+
+Civilization Performance:
+{json.dumps(analysis.get('civilization_stats', {}), indent=2)}
+
+Map Performance:
+{json.dumps(analysis.get('map_stats', {}), indent=2)}
 
 Provide a coaching report with:
 1. Overall performance rating (S/A/B/C/D)
-2. Key strengths (2-3 points)
-3. Areas for improvement (3-4 specific points with timestamps if relevant)
-4. Actionable training recommendations for next games
-5. Civilization-specific tips
+2. Key strengths based on the data (2-3 points)
+3. Areas for improvement (3-4 specific points)
+4. Civilization recommendations (which civs to focus on)
+5. Map-specific advice
+6. Actionable training plan for next 5 games
 
-Format as JSON with these keys: rating, strengths, improvements, training_plan, civ_tips"""
+Format as JSON with these keys: rating, strengths, improvements, civ_recommendations, map_advice, training_plan"""
 
     try:
         response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are an expert AoE IV coach providing concise, actionable advice."},
+                {"role": "system", "content": "You are an expert AoE IV coach providing data-driven, actionable advice."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,
-            max_tokens=1000
+            max_tokens=1500
         )
         
-        # Try to parse as JSON, fallback to text
         content = response.choices[0].message.content
         try:
             return json.loads(content)
         except json.JSONDecodeError:
-            return {"raw_analysis": content}
+            return {"raw_analysis": content, "error": "Failed to parse AI response"}
             
     except Exception as e:
         return {
             "error": f"AI analysis failed: {str(e)}",
-            "tips": ["Check your OpenAI API key"]
+            "fallback": generate_template_report(analysis)
         }
+
+def generate_template_report(analysis: dict) -> dict:
+    """Generate a template coaching report without AI"""
+    win_rate = analysis.get("win_rate", 0)
+    
+    # Determine rating
+    if win_rate >= 70:
+        rating = "S"
+    elif win_rate >= 60:
+        rating = "A"
+    elif win_rate >= 50:
+        rating = "B"
+    elif win_rate >= 40:
+        rating = "C"
+    else:
+        rating = "D"
+    
+    # Find best/worst civs
+    civ_stats = analysis.get("civilization_stats", {})
+    best_civ = max(civ_stats.items(), key=lambda x: x[1].get("win_rate", 0))[0] if civ_stats else "Unknown"
+    worst_civ = min(civ_stats.items(), key=lambda x: x[1].get("win_rate", 0))[0] if civ_stats else "Unknown"
+    
+    return {
+        "rating": rating,
+        "note": "AI coaching requires OpenAI API key. Using template analysis.",
+        "strengths": [
+            f"Strong performance with {best_civ}" if best_civ != "Unknown" else "Consistent civ selection",
+            f"Maintaining {analysis.get('current_rating', 0)} rating" if analysis.get('current_rating', 0) > 0 else "Active ranked play"
+        ],
+        "improvements": [
+            {
+                "issue": f"Lower win rate with {worst_civ}",
+                "fix": f"Practice {worst_civ} build orders in skirmish mode"
+            } if worst_civ != "Unknown" else {
+                "issue": "Win rate below 50%",
+                "fix": "Focus on one civilization to master"
+            },
+            {
+                "issue": "Review recent losses",
+                "fix": "Watch your own replays to identify mistakes"
+            }
+        ],
+        "civ_recommendations": [
+            f"Focus on {best_civ} - your strongest civilization" if best_civ != "Unknown" else "Try English or French for beginners"
+        ],
+        "map_advice": [
+            "Practice on Arabia and Arabia-like open maps",
+            "Learn walling patterns for closed maps"
+        ],
+        "training_plan": [
+            f"Play 5 games with {best_civ}" if best_civ != "Unknown" else "Pick one civ and play 5 games",
+            "Focus on consistent build order execution",
+            "Practice scouting in first 5 minutes",
+            "Review one loss replay after each session"
+        ]
+    }
 
 @app.get("/api/sample-report")
 async def sample_report():
@@ -137,34 +221,42 @@ async def sample_report():
     return {
         "rating": "B+",
         "strengths": [
-            "Good early game economy management",
-            "Effective unit composition in mid-game"
+            "Strong English civilization performance (65% win rate)",
+            "Good rating trend (+15 avg per game)",
+            "Consistent play on open maps"
         ],
         "improvements": [
             {
-                "issue": "Late Castle Age (16:30 vs optimal 14:30)",
-                "impact": "Lost map control early",
-                "fix": "Focus on constant villager production, aim for 14:00 Castle Age"
+                "issue": "Low win rate on water maps (30%)",
+                "impact": "Losing free ELO on maps like Archipelago",
+                "fix": "Practice English Dock into Fast Castle build"
             },
             {
-                "issue": "No scout for 3 minutes (8:00-11:00)",
-                "impact": "Missed enemy military building placement",
-                "fix": "Set a timer for scout rotation every 2 minutes"
+                "issue": "Struggling against French rush",
+                "impact": "0-3 record vs French in last 10 games",
+                "fix": "Learn early defensive build orders, practice walling"
             },
             {
-                "issue": "Resource floating at 20:00",
-                "impact": "Had 2000+ wood unspent",
-                "fix": "Add more production buildings when resources exceed 1000"
+                "issue": "Inconsistent late game (40+ min games)",
+                "impact": "Win rate drops to 35% after 40 minutes",
+                "fix": "Focus on trade and eco upgrades in Imperial"
             }
         ],
-        "training_plan": [
-            "Practice Fast Castle build order in scenario editor",
-            "Play 3 games focusing on constant villager production",
-            "Watch your own replay at 10:00 mark for scout awareness"
+        "civ_recommendations": [
+            "English: Your best civ (65% WR) - keep playing it",
+            "French: Consider learning it (strong meta civ)",
+            "Avoid: Delhi Sultanate (20% WR in your games)"
         ],
-        "civ_tips": [
-            "English: Consider Council Hall timing - you went up at 15:00, optimal is 13:00",
-            "Use network of castles for defense in late game"
+        "map_advice": [
+            "Arabia: Strong performance, keep it up",
+            "Black Forest: Practice booming into Imperial",
+            "Water maps: Need significant improvement"
+        ],
+        "training_plan": [
+            "Play 5 English games focusing on consistent Dark Age",
+            "Practice French rush defense in skirmish (AI Hardest)",
+            "Watch one pro game on a water map",
+            "Learn 2 late-game unit compositions for English"
         ]
     }
 

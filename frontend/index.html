@@ -30,7 +30,7 @@
             margin-bottom: 0.5rem;
         }
         
-        .header p {
+            .header p {
             opacity: 0.9;
         }
         
@@ -40,38 +40,79 @@
             padding: 2rem;
         }
         
-        .upload-section {
+        .input-section {
             background: #16213e;
             border-radius: 12px;
-            padding: 3rem;
-            text-align: center;
+            padding: 2rem;
             margin-bottom: 2rem;
-            border: 2px dashed #667eea;
         }
         
-        .upload-btn {
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        
+        .input-field {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .input-field label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #a0a0a0;
+            font-size: 0.9rem;
+        }
+        
+        .input-field input,
+        .input-field select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #0f3460;
+            border-radius: 8px;
+            background: #0f3460;
+            color: #fff;
+            font-size: 1rem;
+        }
+        
+        .input-field input:focus,
+        .input-field select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
             background: #667eea;
             color: white;
             border: none;
-            padding: 1rem 2rem;
+            padding: 0.75rem 1.5rem;
             border-radius: 8px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.2s;
         }
         
-        .upload-btn:hover {
-            transform: translateY(-2px);
+        .btn:hover {
             background: #764ba2;
+            transform: translateY(-1px);
         }
         
-        .file-input {
-            display: none;
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #667eea;
         }
         
         .loading {
             display: none;
-            margin-top: 1rem;
+            text-align: center;
+            padding: 2rem;
         }
         
         .spinner {
@@ -81,7 +122,7 @@
             border-top-color: transparent;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto;
+            margin: 0 auto 1rem;
         }
         
         @keyframes spin {
@@ -115,7 +156,7 @@
         
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
         }
         
@@ -123,17 +164,26 @@
             background: #0f3460;
             padding: 1rem;
             border-radius: 8px;
+            text-align: center;
         }
         
         .stat-box h3 {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #a0a0a0;
             margin-bottom: 0.5rem;
+            text-transform: uppercase;
         }
         
         .stat-box .value {
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: bold;
+            color: #fff;
+        }
+        
+        .stat-box .sub {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 0.25rem;
         }
         
         .improvement-item {
@@ -163,88 +213,224 @@
             margin-top: 1rem;
         }
         
-        .demo-btn {
-            background: transparent;
-            border: 2px solid #667eea;
-            color: #667eea;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 1rem;
+        .games-list {
+            max-height: 400px;
+            overflow-y: auto;
         }
         
-        .demo-btn:hover {
-            background: #667eea;
+        .game-item {
+            background: #0f3460;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .game-item.win {
+            border-left: 4px solid #27ae60;
+        }
+        
+        .game-item.loss {
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .game-info h4 {
+            margin-bottom: 0.25rem;
+        }
+        
+        .game-info p {
+            font-size: 0.85rem;
+            color: #888;
+        }
+        
+        .game-result {
+            text-align: right;
+        }
+        
+        .game-result .result {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .game-result .result.win {
+            color: #27ae60;
+        }
+        
+        .game-result .result.loss {
+            color: #e74c3c;
+        }
+        
+        .game-result .rating {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 0.25rem;
+        }
+        
+        .help-text {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 0.5rem;
+        }
+        
+        .error {
+            background: #e74c3c;
             color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .player-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .player-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #0f3460;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        
+        .player-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .player-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .player-info p {
+            color: #888;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>🏰 AoE IV AI Coach</h1>
-        <p>AI-powered post-game analysis for Age of Empires IV</p>
+        <p>AI-powered performance analysis using AoE4 World data</p>
     </div>
     
     <div class="container">
-        <!-- Upload Section -->
-        <div class="upload-section" id="uploadSection">
-            <h2>Upload Your Replay</h2>
-            <p style="margin: 1rem 0; color: #a0a0a0;">
-                Drag and drop your .aoe2record file or click to browse
-            </p>
-            <input type="file" id="fileInput" class="file-input" accept=".aoe2record">
-            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
-                📁 Select Replay File
-            </button>
-            <br>
-            <button class="demo-btn" onclick="loadDemo()">🎮 Load Demo Report</button>
+        <!-- Input Section -->
+        <div class="input-section">
+            <h2 style="margin-bottom: 1rem;">Enter Your Player ID</h2>
             
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p style="margin-top: 1rem;">Analyzing your game...</p>
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="profileId">Steam ID or Profile ID</label>
+                    <input type="text" id="profileId" placeholder="e.g., 4635035" value="">
+                </div>
+                
+                <div class="input-field" style="flex: 0.5;">
+                    <label for="gameMode">Game Mode</label>
+                    <select id="gameMode">
+                        <option value="rm_solo">Ranked Solo</option>
+                        <option value="rm_team">Ranked Team</option>
+                        <option value="qm_1v1">Quick Match 1v1</option>
+                        <option value="qm_2v2">Quick Match 2v2</option>
+                    </select>
+                </div>
+                
+                <div class="input-field" style="flex: 0.3;">
+                    <label for="gameLimit">Games</label>
+                    <input type="number" id="gameLimit" value="10" min="1" max="50">
+                </div>
+                
+                <button class="btn" onclick="analyzePlayer()">Analyze</button>
             </div>
+            
+            <p class="help-text">
+                💡 Find your Profile ID on <a href="https://aoe4world.com" target="_blank" style="color: #667eea;">AoE4 World</a> by searching your Steam name
+            </p>
+            
+            <div class="error" id="error"></div>
+            
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #0f3460;">
+                <button class="btn btn-secondary" onclick="loadDemo()">🎮 Load Demo Report</button>
+            </div>
+        </div>
+        
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing your games...</p>
         </div>
         
         <!-- Results Section -->
         <div class="results" id="results">
-            <!-- Game Overview -->
+            <!-- Player Header -->
             <div class="card">
-                <h2>📊 Game Overview</h2>
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <h3>Rating</h3>
-                        <div class="value" id="rating">-</div>
-                    </div>
-                    <div class="stat-box">
-                        <h3>Duration</h3>
-                        <div class="value" id="duration">-</div>
-                    </div>
-                    <div class="stat-box">
-                        <h3>Civilization</h3>
-                        <div class="value" id="civ">-</div>
-                    </div>
-                    <div class="stat-box">
-                        <h3>Map</h3>
-                        <div class="value" id="map">-</div>
+                <div class="player-header">
+                    <div class="player-avatar" id="playerAvatar">👤</div>
+                    <div class="player-info">
+                        <h3 id="playerName">Player Name</h3>
+                        <p id="playerId">Profile ID: -</p>
                     </div>
                 </div>
             </div>
             
-            <!-- Rating Card -->
+            <!-- Performance Overview -->
             <div class="card">
-                <h2>🎯 Performance Rating</h2>
-                <div class="rating" id="ratingBig">B+</div>
-                <p style="text-align: center; color: #a0a0a0;">
-                    Based on build order execution, economy management, and military decisions
+                <h2>📊 Performance Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h3>Rating</h3>
+                        <div class="value" id="currentRating">-</div>
+                        <div class="sub" id="ratingTrend"></div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Win Rate</h3>
+                        <div class="value" id="winRate">-</div>
+                        <div class="sub" id="winLossRecord"></div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Games</h3>
+                        <div class="value" id="totalGames">-</div>
+                        <div class="sub">analyzed</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Coach Rating</h3>
+                        <div class="value" id="coachRating" style="color: #f39c12;">-</div>
+                        <div class="sub">AI assessment</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Rating -->
+            <div class="card">
+                <h2>🎯 AI Performance Rating</h2>
+                <div class="rating" id="ratingBig">-</div>
+                <p style="text-align: center; color: #a0a0a0;" id="ratingDescription">
+                    Based on your recent match history
                 </p>
             </div>
             
             <!-- Charts -->
             <div class="card">
-                <h2>📈 Economy Timeline</h2>
+                <h2>📈 Civilization Performance</h2>
                 <div class="chart-container">
-                    <canvas id="economyChart"></canvas>
+                    <canvas id="civChart"></canvas>
                 </div>
+            </div>
+            
+            <!-- Recent Games -->
+            <div class="card">
+                <h2>🎮 Recent Games</h2>
+                <div class="games-list" id="gamesList"></div>
             </div>
             
             <!-- Strengths -->
@@ -259,55 +445,58 @@
                 <div id="improvementsList"></div>
             </div>
             
+            <!-- Civilization Recommendations -->
+            <div class="card">
+                <h2>🏛️ Civilization Recommendations</h2>
+                <ul id="civRecommendations" style="padding-left: 1.5rem; line-height: 2;"></ul>
+            </div>
+            
+            <!-- Map Advice -->
+            <div class="card">
+                <h2>🗺️ Map Advice</h2>
+                <ul id="mapAdvice" style="padding-left: 1.5rem; line-height: 2;"></ul>
+            </div>
+            
             <!-- Training Plan -->
             <div class="card">
                 <h2>📚 Training Plan</h2>
                 <ul id="trainingList" style="padding-left: 1.5rem; line-height: 2;"></ul>
-            </div>
-            
-            <!-- Civilization Tips -->
-            <div class="card">
-                <h2>🏛️ Civilization-Specific Tips</h2>
-                <ul id="civTipsList" style="padding-left: 1.5rem; line-height: 2;"></ul>
             </div>
         </div>
     </div>
     
     <script>
         const API_URL = 'http://localhost:8000';
-        let economyChart = null;
+        let civChart = null;
         
-        // File upload handler
-        document.getElementById('fileInput').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+        async function analyzePlayer() {
+            const profileId = document.getElementById('profileId').value.trim();
+            const gameMode = document.getElementById('gameMode').value;
+            const gameLimit = document.getElementById('gameLimit').value;
             
-            await analyzeReplay(file);
-        });
-        
-        async function analyzeReplay(file) {
-            // Show loading
+            if (!profileId) {
+                showError('Please enter a Steam ID or Profile ID');
+                return;
+            }
+            
+            hideError();
             document.getElementById('loading').style.display = 'block';
             document.getElementById('results').style.display = 'none';
             
-            const formData = new FormData();
-            formData.append('file', file);
-            
             try {
-                const response = await fetch(`${API_URL}/api/analyze`, {
-                    method: 'POST',
-                    body: formData
-                });
+                const response = await fetch(
+                    `${API_URL}/api/player/${profileId}?leaderboard=${gameMode}&limit=${gameLimit}`
+                );
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to fetch player data');
+                }
                 
                 const data = await response.json();
-                
-                if (data.success) {
-                    displayResults(data);
-                } else {
-                    alert('Analysis failed: ' + (data.error || 'Unknown error'));
-                }
+                displayResults(data);
             } catch (error) {
-                alert('Error: ' + error.message);
+                showError(error.message);
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
@@ -316,21 +505,46 @@
         async function loadDemo() {
             document.getElementById('loading').style.display = 'block';
             document.getElementById('results').style.display = 'none';
+            hideError();
             
             try {
                 const response = await fetch(`${API_URL}/api/sample-report`);
-                const data = await response.json();
+                const sampleData = await response.json();
                 
-                displayResults({
-                    game_info: {
-                        map_name: 'Arabia',
-                        game_duration_formatted: '24:35'
+                // Create mock data structure matching API response
+                const mockData = {
+                    player: {
+                        name: "DemoPlayer",
+                        profile_id: 12345,
+                        country: "US"
                     },
-                    players: [{ civ: 'English', name: 'You' }],
-                    coaching_report: data
-                });
+                    analysis: {
+                        total_games: 10,
+                        wins: 6,
+                        losses: 4,
+                        win_rate: 60,
+                        current_rating: 1200,
+                        civilization_stats: {
+                            "English": { games: 5, wins: 4, win_rate: 80 },
+                            "French": { games: 3, wins: 1, win_rate: 33 },
+                            "Delhi": { games: 2, wins: 1, win_rate: 50 }
+                        },
+                        map_stats: {
+                            "Arabia": { games: 4, wins: 3, win_rate: 75 },
+                            "Black Forest": { games: 3, wins: 1, win_rate: 33 },
+                            "Archipelago": { games: 3, wins: 2, win_rate: 67 }
+                        }
+                    },
+                    recent_games: [
+                        { map: "Arabia", civilization: "English", result: "win", rating: 1215, rating_diff: 15, opponent: { name: "Opponent1", civilization: "French", rating: 1180 } },
+                        { map: "Black Forest", civilization: "French", result: "loss", rating: 1200, rating_diff: -15, opponent: { name: "Opponent2", civilization: "English", rating: 1220 } }
+                    ],
+                    coaching_report: sampleData
+                };
+                
+                displayResults(mockData);
             } catch (error) {
-                alert('Error loading demo: ' + error.message);
+                showError('Failed to load demo: ' + error.message);
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
@@ -339,16 +553,51 @@
         function displayResults(data) {
             document.getElementById('results').style.display = 'block';
             
+            const player = data.player;
+            const analysis = data.analysis;
             const report = data.coaching_report;
-            const gameInfo = data.game_info;
-            const player = data.players[0];
+            const games = data.recent_games;
             
-            // Update overview
-            document.getElementById('rating').textContent = report.rating || 'N/A';
-            document.getElementById('duration').textContent = gameInfo.game_duration_formatted || '24:35';
-            document.getElementById('civ').textContent = player?.civ || 'English';
-            document.getElementById('map').textContent = gameInfo.map_name || 'Arabia';
-            document.getElementById('ratingBig').textContent = report.rating || 'B+';
+            // Update player header
+            document.getElementById('playerName').textContent = player.name;
+            document.getElementById('playerId').textContent = `Profile ID: ${player.profile_id}`;
+            if (player.avatar_url) {
+                document.getElementById('playerAvatar').innerHTML = `<img src="${player.avatar_url}" alt="${player.name}">`;
+            }
+            
+            // Update stats
+            document.getElementById('currentRating').textContent = analysis.current_rating || '-';
+            document.getElementById('winRate').textContent = (analysis.win_rate || 0) + '%';
+            document.getElementById('totalGames').textContent = analysis.total_games || '-';
+            document.getElementById('coachRating').textContent = report.rating || '-';
+            document.getElementById('ratingBig').textContent = report.rating || '-';
+            
+            document.getElementById('winLossRecord').textContent = 
+                `${analysis.wins || 0}W - ${analysis.losses || 0}L`;
+            
+            const ratingDiff = analysis.avg_rating_change;
+            if (ratingDiff > 0) {
+                document.getElementById('ratingTrend').textContent = `+${ratingDiff} avg`;
+                document.getElementById('ratingTrend').style.color = '#27ae60';
+            } else if (ratingDiff < 0) {
+                document.getElementById('ratingTrend').textContent = `${ratingDiff} avg`;
+                document.getElementById('ratingTrend').style.color = '#e74c3c';
+            }
+            
+            // Render games list
+            const gamesList = document.getElementById('gamesList');
+            gamesList.innerHTML = games.map(g => `
+                <div class="game-item ${g.result}">
+                    <div class="game-info">
+                        <h4>${g.civilization} vs ${g.opponent.civilization}</h4>
+                        <p>${g.map} • vs ${g.opponent.name} (${g.opponent.rating})</p>
+                    </div>
+                    <div class="game-result">
+                        <div class="result ${g.result}">${g.result.toUpperCase()}</div>
+                        <div class="rating">${g.rating} (${g.rating_diff > 0 ? '+' : ''}${g.rating_diff})</div>
+                    </div>
+                </div>
+            `).join('');
             
             // Render strengths
             const strengthsList = document.getElementById('strengthsList');
@@ -366,56 +615,51 @@
                 </div>`
             ).join('');
             
-            // Render training plan
-            const trainingList = document.getElementById('trainingList');
-            trainingList.innerHTML = (report.training_plan || []).map(t => 
-                `<li>${t}</li>`
-            ).join('');
+            // Render recommendations
+            document.getElementById('civRecommendations').innerHTML = 
+                (report.civ_recommendations || []).map(r => `<li>${r}</li>`).join('');
             
-            // Render civ tips
-            const civTipsList = document.getElementById('civTipsList');
-            civTipsList.innerHTML = (report.civ_tips || []).map(t => 
-                `<li>${t}</li>`
-            ).join('');
+            document.getElementById('mapAdvice').innerHTML = 
+                (report.map_advice || []).map(a => `<li>${a}</li>`).join('');
+            
+            document.getElementById('trainingList').innerHTML = 
+                (report.training_plan || []).map(t => `<li>${t}</li>`).join('');
             
             // Render chart
-            renderEconomyChart();
+            renderCivChart(analysis.civilization_stats);
             
             // Scroll to results
             document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
         }
         
-        function renderEconomyChart() {
-            const ctx = document.getElementById('economyChart').getContext('2d');
+        function renderCivChart(civStats) {
+            const ctx = document.getElementById('civChart').getContext('2d');
             
-            // Sample data - in real app this comes from replay parser
-            const labels = ['0:00', '5:00', '10:00', '15:00', '20:00', '25:00'];
-            const villagerData = [6, 24, 45, 72, 98, 120];
+            const civs = Object.keys(civStats || {});
+            const winRates = civs.map(c => civStats[c].win_rate);
+            const games = civs.map(c => civStats[c].games);
             
-            if (economyChart) {
-                economyChart.destroy();
+            if (civChart) {
+                civChart.destroy();
             }
             
-            economyChart = new Chart(ctx, {
-                type: 'line',
+            civChart = new Chart(ctx, {
+                type: 'bar',
                 data: {
-                    labels: labels,
+                    labels: civs,
                     datasets: [{
-                        label: 'Villager Count',
-                        data: villagerData,
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        fill: true,
-                        tension: 0.4
+                        label: 'Win Rate (%)',
+                        data: winRates,
+                        backgroundColor: winRates.map(w => w >= 50 ? '#27ae60' : '#e74c3c'),
+                        borderColor: winRates.map(w => w >= 50 ? '#27ae60' : '#e74c3c'),
+                        borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            labels: { color: '#fff' }
-                        }
+                        legend: { display: false }
                     },
                     scales: {
                         x: {
@@ -423,12 +667,24 @@
                             grid: { color: '#333' }
                         },
                         y: {
+                            beginAtZero: true,
+                            max: 100,
                             ticks: { color: '#a0a0a0' },
                             grid: { color: '#333' }
                         }
                     }
                 }
             });
+        }
+        
+        function showError(message) {
+            const errorEl = document.getElementById('error');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+        
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
         }
     </script>
 </body>
