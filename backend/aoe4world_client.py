@@ -112,11 +112,28 @@ class AoE4WorldClient:
             opponent_info = None
             
             for team in teams:
-                if not isinstance(team, dict):
+                # Handle both dict format {"players": [...]} and list format [...]
+                if isinstance(team, dict):
+                    players = team.get("players", [])
+                elif isinstance(team, list):
+                    players = team
+                else:
+                    print(f"DEBUG parse_game: Unexpected team type: {type(team)}")
                     continue
-                for player in team.get("players", []):
-                    if not isinstance(player, dict):
+
+                print(f"DEBUG parse_game: Team has {len(players)} players")
+                for player_wrapper in players:
+                    if not isinstance(player_wrapper, dict):
+                        print(f"DEBUG parse_game: Player wrapper is not dict, type={type(player_wrapper)}")
                         continue
+
+                    # Extract actual player data from wrapper
+                    player = player_wrapper.get('player', player_wrapper)
+                    if not isinstance(player, dict):
+                        print(f"DEBUG parse_game: Player data is not dict, type={type(player)}")
+                        continue
+
+                    print(f"DEBUG parse_game: Player keys: {list(player.keys())}")
                     print(f"DEBUG parse_game: Checking player {player.get('profile_id')} vs {profile_id}")
                     if str(player.get("profile_id")) == str(profile_id):
                         player_info = player
