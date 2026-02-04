@@ -56,8 +56,7 @@ class AoE4WorldClient:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if self.session:
             await self.session.close()
-        if self.connector:
-            self.connector.close()
+        # Note: connector is closed by the session
     
     async def get_player(self, profile_id: str) -> Optional[Dict[str, Any]]:
         """Get player profile by profile_id or steam_id"""
@@ -84,35 +83,64 @@ class AoE4WorldClient:
         async with self.session.get(url, params=params) as response:
             if response.status == 200:
                 data = await response.json()
-                return data.get("games", [])
+                print(f"DEBUG get_player_games: Response type={type(data)}, keys={list(data.keys()) if isinstance(data, dict) else 'N/A'}")
+                # Handle both formats: list directly or dict with "games" key
+                if isinstance(data, list):
+                    return data
+                elif isinstance(data, dict):
+                    return data.get("games", [])
+                return []
             return []
     
     def parse_game(self, game_data: Dict, profile_id: str) -> Optional[Game]:
         """Parse game data and extract player-specific info"""
         try:
+            # Ensure game_data is a dict
+            if not isinstance(game_data, dict):
+                print(f"DEBUG parse_game: game_data is not dict, type={type(game_data)}")
+                return None
+                
             teams = game_data.get("teams", [])
+            if not teams:
+                print(f"DEBUG parse_game: No teams found in game_data")
+                return None
+                
+            print(f"DEBUG parse_game: Found {len(teams)} teams")
             
             # Find the player in teams
             player_info = None
             opponent_info = None
             
             for team in teams:
+                if not isinstance(team, dict):
+                    continue
                 for player in team.get("players", []):
+                    if not isinstance(player, dict):
+                        continue
+                    print(f"DEBUG parse_game: Checking player {player.get('profile_id')} vs {profile_id}")
                     if str(player.get("profile_id")) == str(profile_id):
                         player_info = player
+                        print(f"DEBUG parse_game: Found target player")
                     else:
                         # Take first opponent found
                         if not opponent_info:
                             opponent_info = player
             
             if not player_info:
+                print(f"DEBUG parse_game: Player not found in game")
                 return None
+            
+            # Parse date safely
+            started_at_str = game_data.get("started_at", "")
+            try:
+                started_at = datetime.fromisoformat(started_at_str.replace("Z", "+00:00"))
+            except Exception as date_err:
+                print(f"DEBUG parse_game: Date parse error: {date_err}, using now")
+                started_at = datetime.now()
             
             return Game(
                 game_id=game_data.get("game_id", ""),
-                started_at=datetime.fromisoformat(
-                    game_data.get("started_at", "").replace("Z", "+00:00")
-                ),
+                started_at=started_at,
                 duration=game_data.get("duration", 0),
                 map=game_data.get("map", "Unknown"),
                 kind=game_data.get("kind", "unknown"),
@@ -126,6 +154,8 @@ class AoE4WorldClient:
             )
         except Exception as e:
             print(f"Error parsing game: {e}")
+            import traceback
+            traceback.print_exc()
             return None
     
     def analyze_performance(self, games: List[Game]) -> Dict[str, Any]:
