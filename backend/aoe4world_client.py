@@ -82,6 +82,11 @@ class GameSummary:
     # Opponent
     opponent_name: str
     opponent_civ: str
+    opponent_apm: int
+    opponent_build_order: List[Dict[str, Any]]
+    opponent_feudal_age_time: Optional[int]
+    opponent_castle_age_time: Optional[int]
+    opponent_imperial_age_time: Optional[int]
 
 class AoE4WorldClient:
     """Client for AoE4 World API"""
@@ -196,6 +201,12 @@ class AoE4WorldClient:
             castle_age_time = actions.get("castleAge", [None])[0]
             imperial_age_time = actions.get("imperialAge", [None])[0]
 
+            # Extract opponent age up timings from actions
+            opponent_actions = opponent_data.get("actions", {}) if opponent_data else {}
+            opponent_feudal_age_time = opponent_actions.get("feudalAge", [None])[0] if opponent_data else None
+            opponent_castle_age_time = opponent_actions.get("castleAge", [None])[0] if opponent_data else None
+            opponent_imperial_age_time = opponent_actions.get("imperialAge", [None])[0] if opponent_data else None
+
             return GameSummary(
                 game_id=summary_data.get("gameId"),
                 duration=summary_data.get("duration", 0),
@@ -213,7 +224,12 @@ class AoE4WorldClient:
                 total_resources_spent=player_data.get("totalResourcesSpent", {}),
                 final_score=player_data.get("scores", {}),
                 opponent_name=opponent_data.get("name", "Unknown") if opponent_data else "Unknown",
-                opponent_civ=opponent_data.get("civilization", "Unknown") if opponent_data else "Unknown"
+                opponent_civ=opponent_data.get("civilization", "Unknown") if opponent_data else "Unknown",
+                opponent_apm=opponent_data.get("apm", 0) if opponent_data else 0,
+                opponent_build_order=opponent_data.get("buildOrder", []) if opponent_data else [],
+                opponent_feudal_age_time=opponent_feudal_age_time,
+                opponent_castle_age_time=opponent_castle_age_time,
+                opponent_imperial_age_time=opponent_imperial_age_time
             )
         except Exception as e:
             print(f"Error parsing game summary: {e}")

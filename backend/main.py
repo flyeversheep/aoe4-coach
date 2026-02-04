@@ -424,23 +424,41 @@ async def get_game_build_order(
             },
             "opponent": {
                 "name": game_summary.opponent_name,
-                "civilization": game_summary.opponent_civ
+                "civilization": game_summary.opponent_civ,
+                "apm": game_summary.opponent_apm
             },
             "timings": {
-                "feudal_age": {
-                    "seconds": game_summary.feudal_age_time,
-                    "formatted": format_time(game_summary.feudal_age_time)
+                "player": {
+                    "feudal_age": {
+                        "seconds": game_summary.feudal_age_time,
+                        "formatted": format_time(game_summary.feudal_age_time)
+                    },
+                    "castle_age": {
+                        "seconds": game_summary.castle_age_time,
+                        "formatted": format_time(game_summary.castle_age_time)
+                    },
+                    "imperial_age": {
+                        "seconds": game_summary.imperial_age_time,
+                        "formatted": format_time(game_summary.imperial_age_time)
+                    }
                 },
-                "castle_age": {
-                    "seconds": game_summary.castle_age_time,
-                    "formatted": format_time(game_summary.castle_age_time)
-                },
-                "imperial_age": {
-                    "seconds": game_summary.imperial_age_time,
-                    "formatted": format_time(game_summary.imperial_age_time)
+                "opponent": {
+                    "feudal_age": {
+                        "seconds": game_summary.opponent_feudal_age_time,
+                        "formatted": format_time(game_summary.opponent_feudal_age_time)
+                    },
+                    "castle_age": {
+                        "seconds": game_summary.opponent_castle_age_time,
+                        "formatted": format_time(game_summary.opponent_castle_age_time)
+                    },
+                    "imperial_age": {
+                        "seconds": game_summary.opponent_imperial_age_time,
+                        "formatted": format_time(game_summary.opponent_imperial_age_time)
+                    }
                 }
             },
             "build_order": game_summary.build_order,
+            "opponent_build_order": game_summary.opponent_build_order,
             "raw_data": summary_data  # Include raw data for debugging/future use
         }
 

@@ -406,6 +406,66 @@
             margin-bottom: 1rem;
             display: none;
         }
+
+        .build-order-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .build-order-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .build-order-column {
+            min-width: 0;
+        }
+
+        /* Player theme - blue/purple */
+        #playerBuildOrderColumn .build-order-item {
+            border-left: 3px solid #667eea;
+        }
+
+        #playerBuildOrderColumn .build-order-time {
+            color: #667eea;
+        }
+
+        /* Opponent theme - red */
+        #opponentBuildOrderColumn .build-order-item {
+            border-left: 3px solid #e74c3c;
+        }
+
+        #opponentBuildOrderColumn .build-order-time {
+            color: #e74c3c;
+        }
+
+        .timing-comparison {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #0f3460;
+            border-radius: 8px;
+        }
+
+        .timing-comparison-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            gap: 0.5rem;
+        }
+
+        .timing-winner {
+            font-size: 0.85rem;
+            color: #27ae60;
+        }
+
+        .timing-loser {
+            font-size: 0.85rem;
+            color: #e74c3c;
+        }
     </style>
 </head>
 <body>
@@ -633,8 +693,54 @@
             <!-- Build Order Timeline -->
             <div class="card">
                 <h2>📜 Build Order</h2>
-                <div class="build-order-timeline" id="buildOrderTimeline">
-                    <!-- Timeline items will be inserted here -->
+
+                <!-- Timing Comparison -->
+                <div class="timing-comparison" id="timingComparison">
+                    <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">⚔️ Age Up Comparison</h3>
+                    <div class="timing-comparison-row">
+                        <span>Feudal Age:</span>
+                        <span id="comp-feudal-player">-</span>
+                        <span>vs</span>
+                        <span id="comp-feudal-opponent">-</span>
+                        <span id="comp-feudal-winner" class="timing-winner"></span>
+                    </div>
+                    <div class="timing-comparison-row">
+                        <span>Castle Age:</span>
+                        <span id="comp-castle-player">-</span>
+                        <span>vs</span>
+                        <span id="comp-castle-opponent">-</span>
+                        <span id="comp-castle-winner" class="timing-winner"></span>
+                    </div>
+                    <div class="timing-comparison-row">
+                        <span>Imperial Age:</span>
+                        <span id="comp-imperial-player">-</span>
+                        <span>vs</span>
+                        <span id="comp-imperial-opponent">-</span>
+                        <span id="comp-imperial-winner" class="timing-winner"></span>
+                    </div>
+                </div>
+
+                <!-- Side-by-side Build Orders -->
+                <div class="build-order-container">
+                    <!-- Player Build Order -->
+                    <div class="build-order-column" id="playerBuildOrderColumn">
+                        <h3 style="color: #667eea; margin-bottom: 1rem;">
+                            <span id="player-column-name">Your Build Order</span>
+                        </h3>
+                        <div class="build-order-timeline" id="buildOrderTimeline">
+                            <!-- Player timeline items -->
+                        </div>
+                    </div>
+
+                    <!-- Opponent Build Order -->
+                    <div class="build-order-column" id="opponentBuildOrderColumn">
+                        <h3 style="color: #e74c3c; margin-bottom: 1rem;">
+                            <span id="opponent-column-name">Opponent Build Order</span>
+                        </h3>
+                        <div class="build-order-timeline" id="opponentBuildOrderTimeline">
+                            <!-- Opponent timeline items -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -779,6 +885,7 @@
             const opponent = data.opponent;
             const timings = data.timings || {};
             const buildOrder = data.build_order || [];
+            const opponentBuildOrder = data.opponent_build_order || [];
 
             // Game header
             document.getElementById('bo-map').textContent = game.map || 'Unknown Map';
@@ -806,73 +913,131 @@
             document.getElementById('bo-opponentCiv').textContent = opponent.civilization || '-';
             document.getElementById('bo-opponentRating').textContent = opponent.rating || '-';
 
-            // Age timings
+            // Age timings (now using player timings)
+            const playerTimings = timings.player || {};
             document.getElementById('bo-feudalTime').textContent =
-                timings.feudal_age?.formatted || formatTime(timings.feudal_age?.seconds) || '-';
+                playerTimings.feudal_age?.formatted || formatTime(playerTimings.feudal_age?.seconds) || '-';
             document.getElementById('bo-castleTime').textContent =
-                timings.castle_age?.formatted || formatTime(timings.castle_age?.seconds) || '-';
+                playerTimings.castle_age?.formatted || formatTime(playerTimings.castle_age?.seconds) || '-';
             document.getElementById('bo-imperialTime').textContent =
-                timings.imperial_age?.formatted || formatTime(timings.imperial_age?.seconds) || '-';
+                playerTimings.imperial_age?.formatted || formatTime(playerTimings.imperial_age?.seconds) || '-';
 
             // Performance stats
             document.getElementById('bo-apm').textContent = player.apm || '-';
             document.getElementById('bo-villagers').textContent = player.villager_high || '-';
             document.getElementById('bo-military').textContent = player.military_count || '-';
 
-            // Build order timeline
-            const timeline = document.getElementById('buildOrderTimeline');
-            if (buildOrder && buildOrder.length > 0) {
-                // Process build order items to create timeline entries
-                const timelineItems = [];
+            // Update player column name
+            document.getElementById('player-column-name').textContent =
+                `${player.name || 'You'} (${player.civilization || '-'})`;
 
-                buildOrder.forEach(item => {
-                    const itemName = item.icon ? item.icon.split('/').pop().replace(/_/g, ' ') : item.type;
+            // Update opponent column name
+            document.getElementById('opponent-column-name').textContent =
+                `${opponent.name || 'Opponent'} (${opponent.civilization || '-'})`;
 
-                    // Add constructed events
-                    if (item.constructed && item.constructed.length > 0) {
-                        item.constructed.forEach(time => {
-                            timelineItems.push({
-                                time: time,
-                                action: `Started ${itemName}`,
-                                type: item.type
-                            });
-                        });
-                    }
+            // Render timing comparison
+            updateTimingComparison(timings);
 
-                    // Add finished events (units created, buildings completed)
-                    if (item.finished && item.finished.length > 0) {
-                        item.finished.forEach((time, index) => {
-                            timelineItems.push({
-                                time: time,
-                                action: `${itemName}`,
-                                count: item.finished.length > 1 ? `#${index + 1}` : '',
-                                type: item.type
-                            });
-                        });
-                    }
-                });
+            // Render player build order timeline
+            renderBuildOrderTimeline('buildOrderTimeline', buildOrder);
 
-                // Sort by time and limit to reasonable amount
-                timelineItems.sort((a, b) => a.time - b.time);
-                const displayItems = timelineItems.slice(0, 200); // Limit display
-
-                if (displayItems.length > 0) {
-                    timeline.innerHTML = displayItems.map(item => `
-                        <div class="build-order-item">
-                            <div class="build-order-time">${formatTime(item.time)}</div>
-                            <div class="build-order-action">${item.action}</div>
-                            <div class="build-order-count">${item.count || ''}</div>
-                        </div>
-                    `).join('');
-                } else {
-                    timeline.innerHTML = '<p style="color: #888; text-align: center;">No build order events found</p>';
-                }
-            } else {
-                timeline.innerHTML = '<p style="color: #888; text-align: center;">No build order data available</p>';
-            }
+            // Render opponent build order timeline
+            renderBuildOrderTimeline('opponentBuildOrderTimeline', opponentBuildOrder);
 
             // Scroll to results
             document.getElementById('buildOrderView').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateTimingComparison(timings) {
+            const player = timings.player || {};
+            const opponent = timings.opponent || {};
+
+            // Feudal Age
+            updateTimingRow('feudal', player.feudal_age, opponent.feudal_age);
+            // Castle Age
+            updateTimingRow('castle', player.castle_age, opponent.castle_age);
+            // Imperial Age
+            updateTimingRow('imperial', player.imperial_age, opponent.imperial_age);
+        }
+
+        function updateTimingRow(age, playerData, opponentData) {
+            const playerTime = playerData?.formatted || '-';
+            const opponentTime = opponentData?.formatted || '-';
+            const playerSeconds = playerData?.seconds;
+            const opponentSeconds = opponentData?.seconds;
+
+            document.getElementById(`comp-${age}-player`).textContent = playerTime;
+            document.getElementById(`comp-${age}-opponent`).textContent = opponentTime;
+
+            const winnerEl = document.getElementById(`comp-${age}-winner`);
+
+            if (playerSeconds && opponentSeconds) {
+                const diff = playerSeconds - opponentSeconds;
+                if (diff < 0) {
+                    winnerEl.textContent = `✓ ${Math.abs(diff)}s faster`;
+                    winnerEl.className = 'timing-winner';
+                } else if (diff > 0) {
+                    winnerEl.textContent = `${diff}s slower`;
+                    winnerEl.className = 'timing-loser';
+                } else {
+                    winnerEl.textContent = 'Same time';
+                    winnerEl.className = '';
+                    winnerEl.style.color = '#888';
+                }
+            } else {
+                winnerEl.textContent = '';
+            }
+        }
+
+        function renderBuildOrderTimeline(elementId, buildOrder) {
+            const timeline = document.getElementById(elementId);
+
+            if (!buildOrder || buildOrder.length === 0) {
+                timeline.innerHTML = '<p style="color: #888; text-align: center;">No build order data available</p>';
+                return;
+            }
+
+            // Process build order items to create timeline entries
+            const timelineItems = [];
+
+            buildOrder.forEach(item => {
+                const itemName = item.icon ? item.icon.split('/').pop().replace(/_/g, ' ') : item.type;
+
+                // Add constructed events
+                if (item.constructed && item.constructed.length > 0) {
+                    item.constructed.forEach(time => {
+                        timelineItems.push({
+                            time: time,
+                            action: `Started ${itemName}`,
+                            type: item.type
+                        });
+                    });
+                }
+
+                // Add finished events (units created, buildings completed)
+                if (item.finished && item.finished.length > 0) {
+                    item.finished.forEach((time, index) => {
+                        timelineItems.push({
+                            time: time,
+                            action: `${itemName}`,
+                            count: item.finished.length > 1 ? `#${index + 1}` : '',
+                            type: item.type
+                        });
+                    });
+                }
+            });
+
+            // Sort by time and limit to reasonable amount
+            timelineItems.sort((a, b) => a.time - b.time);
+            const displayItems = timelineItems.slice(0, 200);
+
+            timeline.innerHTML = displayItems.map(item => `
+                <div class="build-order-item">
+                    <div class="build-order-time">${formatTime(item.time)}</div>
+                    <div class="build-order-action">${item.action}</div>
+                    <div class="build-order-count">${item.count || ''}</div>
+                </div>
+            `).join('');
         }
 
         async function analyzePlayer() {
