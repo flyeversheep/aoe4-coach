@@ -367,6 +367,83 @@ def generate_template_report(analysis: dict) -> dict:
         ]
     }
 
+@app.get("/api/game/{profile_id}/{game_id}")
+async def get_game_build_order(
+    profile_id: str,
+    game_id: str,
+    sig: Optional[str] = Query(None, description="Optional signature for private games")
+):
+    """
+    Fetch detailed game summary including build order
+
+    - profile_id: Steam ID or AoE4 World Profile ID
+    - game_id: Game ID to fetch
+    - sig: Optional signature for authentication (from game URL)
+    """
+    print(f"DEBUG: Fetching build order for game {game_id}, profile {profile_id}")
+
+    async with AoE4WorldClient() as client:
+        # Get game summary
+        summary_data = await client.get_game_summary(profile_id, game_id, sig)
+
+        if not summary_data:
+            raise HTTPException(status_code=404, detail="Game not found or not accessible")
+
+        # Parse the summary
+        game_summary = client.parse_game_summary(summary_data, profile_id)
+
+        if not game_summary:
+            raise HTTPException(status_code=500, detail="Failed to parse game data")
+
+        # Helper function to format time
+        def format_time(seconds):
+            if seconds is None:
+                return None
+            mins = seconds // 60
+            secs = seconds % 60
+            return f"{mins}:{secs:02d}"
+
+        # Return structured data
+        return {
+            "success": True,
+            "game": {
+                "game_id": game_summary.game_id,
+                "map": game_summary.map_name,
+                "duration": game_summary.duration,
+                "duration_formatted": format_time(game_summary.duration),
+                "win_reason": game_summary.win_reason
+            },
+            "player": {
+                "name": game_summary.player_name,
+                "civilization": game_summary.player_civ,
+                "result": game_summary.player_result,
+                "apm": game_summary.player_apm,
+                "final_score": game_summary.final_score,
+                "resources_gathered": game_summary.total_resources_gathered,
+                "resources_spent": game_summary.total_resources_spent
+            },
+            "opponent": {
+                "name": game_summary.opponent_name,
+                "civilization": game_summary.opponent_civ
+            },
+            "timings": {
+                "feudal_age": {
+                    "seconds": game_summary.feudal_age_time,
+                    "formatted": format_time(game_summary.feudal_age_time)
+                },
+                "castle_age": {
+                    "seconds": game_summary.castle_age_time,
+                    "formatted": format_time(game_summary.castle_age_time)
+                },
+                "imperial_age": {
+                    "seconds": game_summary.imperial_age_time,
+                    "formatted": format_time(game_summary.imperial_age_time)
+                }
+            },
+            "build_order": game_summary.build_order,
+            "raw_data": summary_data  # Include raw data for debugging/future use
+        }
+
 @app.get("/api/sample-report")
 async def sample_report():
     """Return a sample coaching report for demo purposes"""
