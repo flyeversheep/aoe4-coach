@@ -11,14 +11,49 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-import openai
+import ssl
+import certifi
+import httpx
+from openai import OpenAI
 
 from aoe4world_client import AoE4WorldClient
 
-# Config
+# Config - Support multiple AI providers
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-if OPENAI_API_KEY:
-    openai.api_key = OPENAI_API_KEY
+ZAI_API_KEY = os.getenv("ZAI_API_KEY", "")
+ZAI_BASE_URL = os.getenv("ZAI_BASE_URL", "https://api.z.ai/api/paas/v4/")  # z.ai API endpoint
+AI_PROVIDER = os.getenv("AI_PROVIDER", "auto")  # auto, openai, or zai
+AI_MODEL = os.getenv("AI_MODEL", "")  # Optional: override default model
+
+# Create SSL context for AoE4 World API (used in aoe4world_client)
+ssl_context = ssl.create_default_context(cafile=certifi.where())
+
+# Initialize AI client with default settings (handles SSL automatically)
+ai_client = None
+active_provider = None
+
+# Try to initialize based on preference
+if AI_PROVIDER == "zai" or (AI_PROVIDER == "auto" and ZAI_API_KEY and not OPENAI_API_KEY):
+    if ZAI_API_KEY:
+        try:
+            ai_client = OpenAI(api_key=ZAI_API_KEY, base_url=ZAI_BASE_URL)
+            active_provider = "zai"
+            print(f"INFO: z.ai client initialized successfully (endpoint: {ZAI_BASE_URL})")
+        except Exception as e:
+            print(f"ERROR: Failed to init z.ai client: {e}")
+
+if not ai_client and OPENAI_API_KEY:
+    try:
+        ai_client = OpenAI(api_key=OPENAI_API_KEY)
+        active_provider = "openai"
+        print("INFO: OpenAI client initialized successfully")
+    except Exception as e:
+        print(f"ERROR: Failed to init OpenAI client: {e}")
+
+if ai_client:
+    print(f"INFO: Using AI provider: {active_provider}")
+else:
+    print("WARN: No AI provider configured. Set OPENAI_API_KEY or ZAI_API_KEY environment variable.")
 
 app = FastAPI(title="AoE IV AI Coach", version="0.2.0")
 
@@ -124,15 +159,59 @@ async def get_player_analysis(
                 }
                 for g in games[:5]  # Include last 5 games in detail
             ],
-            "coaching_report": coaching_report
+            "coaching_report": {
+                **coaching_report,
+                "ai_generated": bool(ai_client and "error" not in coaching_report),
+                "ai_provider": active_provider if (ai_client and "error" not in coaching_report) else None,
+                "disclaimer": f"🤖 AI-Generated Coaching Advice ({active_provider})" if ai_client and "error" not in coaching_report else "📋 Template Report (Configure OPENAI_API_KEY or ZAI_API_KEY for AI coaching)"
+            }
         }
+
+def normalize_coaching_report(report: dict) -> dict:
+    """Normalize AI coaching report to ensure correct data types"""
+    # Ensure arrays for fields that should be arrays
+    array_fields = ['strengths', 'improvements', 'civ_recommendations', 'map_advice', 'training_plan']
+
+    for field in array_fields:
+        if field in report:
+            value = report[field]
+            # If it's a string, split it or wrap it in an array
+            if isinstance(value, str):
+                # Try to split by newlines or bullet points
+                if '\n' in value:
+                    report[field] = [line.strip('- •*') for line in value.split('\n') if line.strip()]
+                else:
+                    report[field] = [value]
+            # If it's a dict, convert values to list
+            elif isinstance(value, dict):
+                report[field] = list(value.values())
+            # Ensure it's a list
+            elif not isinstance(value, list):
+                report[field] = [str(value)]
+
+    # Ensure improvements is an array of objects with proper structure
+    if 'improvements' in report and isinstance(report['improvements'], list):
+        normalized_improvements = []
+        for imp in report['improvements']:
+            if isinstance(imp, str):
+                # Convert string to object format
+                normalized_improvements.append({"issue": imp, "fix": "See coaching notes"})
+            elif isinstance(imp, dict):
+                normalized_improvements.append(imp)
+        report['improvements'] = normalized_improvements
+
+    return report
 
 async def generate_coaching_report(player_data: dict, analysis: dict, games: list) -> dict:
     """
     Generate AI-powered coaching report using OpenAI
     """
-    if not OPENAI_API_KEY:
+    print(f"DEBUG: AI provider: {active_provider}")
+    print(f"DEBUG: AI client initialized: {ai_client is not None}")
+
+    if not ai_client:
         # Return template report without AI
+        print("DEBUG: No AI client available, using template report")
         return generate_template_report(analysis)
     
     # Prepare data for AI
@@ -154,6 +233,11 @@ Civilization Performance:
 Map Performance:
 {json.dumps(analysis.get('map_stats', {}), indent=2)}
 
+IMPORTANT:
+- Respond in ENGLISH only
+- Output ONLY valid JSON, no additional text
+- Do not include reasoning or explanations outside the JSON structure
+
 Provide a coaching report with:
 1. Overall performance rating (S/A/B/C/D)
 2. Key strengths based on the data (2-3 points)
@@ -164,24 +248,64 @@ Provide a coaching report with:
 
 Format as JSON with these keys: rating, strengths, improvements, civ_recommendations, map_advice, training_plan"""
 
+    # Determine model to use
+    if AI_MODEL:
+        model = AI_MODEL
+    elif active_provider == "zai":
+        model = "glm-4.6"  # z.ai flagship model (GLM-4.6, not 4.7)
+    else:
+        model = "gpt-4o-mini"  # OpenAI default model
+
     try:
-        response = openai.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are an expert AoE IV coach providing data-driven, actionable advice."},
+        print(f"DEBUG: Calling {active_provider} API with model {model}...")
+
+        # Prepare API call parameters
+        api_params = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": "You are an expert AoE IV coach providing data-driven, actionable advice in English. Always respond with valid JSON only."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.7,
-            max_tokens=1500
-        )
-        
-        content = response.choices[0].message.content
+            "temperature": 0.7,
+            "max_tokens": 4000  # Increased for longer responses
+        }
+
+        # GLM models support additional parameters
+        if active_provider == "zai":
+            # Disable extended thinking mode to get direct output
+            api_params["extra_body"] = {"thinking": {"type": "disabled"}}
+
+        response = ai_client.chat.completions.create(**api_params)
+
+        print(f"DEBUG: {active_provider} API call successful")
+        message = response.choices[0].message
+
+        # GLM models may use reasoning_content instead of content
+        content = message.content
+        if not content and hasattr(message, 'reasoning_content'):
+            content = message.reasoning_content
+            print(f"DEBUG: Using reasoning_content instead of content")
+
+        print(f"DEBUG: AI response length: {len(content) if content else 0}")
+        print(f"DEBUG: Finish reason: {response.choices[0].finish_reason}")
+
+        if not content:
+            print("DEBUG: Empty response from AI")
+            return {"error": "Empty response from AI", "fallback": generate_template_report(analysis)}
+
         try:
-            return json.loads(content)
+            parsed_response = json.loads(content)
+            # Normalize response format to ensure arrays where expected
+            return normalize_coaching_report(parsed_response)
         except json.JSONDecodeError:
+            print("DEBUG: Failed to parse AI response as JSON")
             return {"raw_analysis": content, "error": "Failed to parse AI response"}
-            
+
     except Exception as e:
+        print(f"DEBUG: OpenAI API error: {str(e)}")
+        print(f"DEBUG: Error type: {type(e).__name__}")
+        import traceback
+        print(f"DEBUG: Traceback: {traceback.format_exc()}")
         return {
             "error": f"AI analysis failed: {str(e)}",
             "fallback": generate_template_report(analysis)
@@ -285,7 +409,9 @@ async def sample_report():
             "Practice French rush defense in skirmish (AI Hardest)",
             "Watch one pro game on a water map",
             "Learn 2 late-game unit compositions for English"
-        ]
+        ],
+        "ai_generated": True,
+        "disclaimer": "🤖 AI-Generated Coaching Advice (Sample)"
     }
 
 if __name__ == "__main__":
