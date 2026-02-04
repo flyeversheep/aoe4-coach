@@ -1,0 +1,17 @@
+{
+  "name": "aoe4-coach",
+  "version": "0.1.0",
+  "description": "AI-powered post-game analysis for Age of Empires IV",
+  "main": "backend/main.py",
+  "scripts": {
+    "start": "cd backend && python main.py",
+    "dev": "cd backend && uvicorn main:app --reload"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flyeversheep/aoe4-coach.git"
+  },
+  "keywords": ["aoe4", "age-of-empires", "ai-coach", "gaming"],
+  "author": "Yuyang Lao",
+  "license": "MIT"
+}

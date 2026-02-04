@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AoE IV AI Coach</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .upload-section {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            border: 2px dashed #667eea;
+        }
+        
+        .upload-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            background: #764ba2;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .loading {
+            display: none;
+            margin-top: 1rem;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #667eea;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .results {
+            display: none;
+        }
+        
+        .card {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .rating {
+            font-size: 4rem;
+            font-weight: bold;
+            text-align: center;
+            color: #f39c12;
+            margin: 1rem 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .stat-box {
+            background: #0f3460;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .stat-box h3 {
+            font-size: 0.9rem;
+            color: #a0a0a0;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-box .value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .improvement-item {
+            background: #0f3460;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .improvement-item h4 {
+            color: #e74c3c;
+            margin-bottom: 0.5rem;
+        }
+        
+        .strength-item {
+            background: #0f3460;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+        
+        .demo-btn {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        
+        .demo-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏰 AoE IV AI Coach</h1>
+        <p>AI-powered post-game analysis for Age of Empires IV</p>
+    </div>
+    
+    <div class="container">
+        <!-- Upload Section -->
+        <div class="upload-section" id="uploadSection">
+            <h2>Upload Your Replay</h2>
+            <p style="margin: 1rem 0; color: #a0a0a0;">
+                Drag and drop your .aoe2record file or click to browse
+            </p>
+            <input type="file" id="fileInput" class="file-input" accept=".aoe2record">
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                📁 Select Replay File
+            </button>
+            <br>
+            <button class="demo-btn" onclick="loadDemo()">🎮 Load Demo Report</button>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 1rem;">Analyzing your game...</p>
+            </div>
+        </div>
+        
+        <!-- Results Section -->
+        <div class="results" id="results">
+            <!-- Game Overview -->
+            <div class="card">
+                <h2>📊 Game Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h3>Rating</h3>
+                        <div class="value" id="rating">-</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Duration</h3>
+                        <div class="value" id="duration">-</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Civilization</h3>
+                        <div class="value" id="civ">-</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Map</h3>
+                        <div class="value" id="map">-</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rating Card -->
+            <div class="card">
+                <h2>🎯 Performance Rating</h2>
+                <div class="rating" id="ratingBig">B+</div>
+                <p style="text-align: center; color: #a0a0a0;">
+                    Based on build order execution, economy management, and military decisions
+                </p>
+            </div>
+            
+            <!-- Charts -->
+            <div class="card">
+                <h2>📈 Economy Timeline</h2>
+                <div class="chart-container">
+                    <canvas id="economyChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Strengths -->
+            <div class="card">
+                <h2>💪 Strengths</h2>
+                <div id="strengthsList"></div>
+            </div>
+            
+            <!-- Improvements -->
+            <div class="card">
+                <h2>🔧 Areas for Improvement</h2>
+                <div id="improvementsList"></div>
+            </div>
+            
+            <!-- Training Plan -->
+            <div class="card">
+                <h2>📚 Training Plan</h2>
+                <ul id="trainingList" style="padding-left: 1.5rem; line-height: 2;"></ul>
+            </div>
+            
+            <!-- Civilization Tips -->
+            <div class="card">
+                <h2>🏛️ Civilization-Specific Tips</h2>
+                <ul id="civTipsList" style="padding-left: 1.5rem; line-height: 2;"></ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let economyChart = null;
+        
+        // File upload handler
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            await analyzeReplay(file);
+        });
+        
+        async function analyzeReplay(file) {
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch(`${API_URL}/api/analyze`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    alert('Analysis failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+        
+        async function loadDemo() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_URL}/api/sample-report`);
+                const data = await response.json();
+                
+                displayResults({
+                    game_info: {
+                        map_name: 'Arabia',
+                        game_duration_formatted: '24:35'
+                    },
+                    players: [{ civ: 'English', name: 'You' }],
+                    coaching_report: data
+                });
+            } catch (error) {
+                alert('Error loading demo: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+        
+        function displayResults(data) {
+            document.getElementById('results').style.display = 'block';
+            
+            const report = data.coaching_report;
+            const gameInfo = data.game_info;
+            const player = data.players[0];
+            
+            // Update overview
+            document.getElementById('rating').textContent = report.rating || 'N/A';
+            document.getElementById('duration').textContent = gameInfo.game_duration_formatted || '24:35';
+            document.getElementById('civ').textContent = player?.civ || 'English';
+            document.getElementById('map').textContent = gameInfo.map_name || 'Arabia';
+            document.getElementById('ratingBig').textContent = report.rating || 'B+';
+            
+            // Render strengths
+            const strengthsList = document.getElementById('strengthsList');
+            strengthsList.innerHTML = (report.strengths || []).map(s => 
+                `<div class="strength-item">✅ ${s}</div>`
+            ).join('');
+            
+            // Render improvements
+            const improvementsList = document.getElementById('improvementsList');
+            improvementsList.innerHTML = (report.improvements || []).map(imp => 
+                `<div class="improvement-item">
+                    <h4>${imp.issue || imp}</h4>
+                    ${imp.impact ? `<p><strong>Impact:</strong> ${imp.impact}</p>` : ''}
+                    ${imp.fix ? `<p><strong>Fix:</strong> ${imp.fix}</p>` : ''}
+                </div>`
+            ).join('');
+            
+            // Render training plan
+            const trainingList = document.getElementById('trainingList');
+            trainingList.innerHTML = (report.training_plan || []).map(t => 
+                `<li>${t}</li>`
+            ).join('');
+            
+            // Render civ tips
+            const civTipsList = document.getElementById('civTipsList');
+            civTipsList.innerHTML = (report.civ_tips || []).map(t => 
+                `<li>${t}</li>`
+            ).join('');
+            
+            // Render chart
+            renderEconomyChart();
+            
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function renderEconomyChart() {
+            const ctx = document.getElementById('economyChart').getContext('2d');
+            
+            // Sample data - in real app this comes from replay parser
+            const labels = ['0:00', '5:00', '10:00', '15:00', '20:00', '25:00'];
+            const villagerData = [6, 24, 45, 72, 98, 120];
+            
+            if (economyChart) {
+                economyChart.destroy();
+            }
+            
+            economyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Villager Count',
+                        data: villagerData,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#a0a0a0' },
+                            grid: { color: '#333' }
+                        },
+                        y: {
+                            ticks: { color: '#a0a0a0' },
+                            grid: { color: '#333' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
