@@ -9,7 +9,8 @@ from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 import openai
 
 from aoe4world_client import AoE4WorldClient
@@ -30,9 +31,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Serve frontend static files
+import os
+frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")
+if os.path.exists(frontend_path):
+    app.mount("/static", StaticFiles(directory=frontend_path), name="static")
+
 @app.get("/")
 async def root():
-    return {"message": "AoE IV AI Coach API", "version": "0.2.0", "data_source": "AoE4 World"}
+    # Serve index.html if it exists, otherwise return API info
+    index_path = os.path.join(frontend_path, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"message": "AoE IV AI Coach API", "version": "0.2.0", "data_source": "AoE4 World", "frontend": "Place frontend/index.html next to backend folder"}
 
 @app.get("/api/player/{profile_id}")
 async def get_player_analysis(

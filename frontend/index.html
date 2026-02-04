@@ -466,7 +466,10 @@
     </div>
     
     <script>
-        const API_URL = 'http://localhost:8000';
+        // Auto-detect API URL - works both with separate frontend server and integrated backend
+        const API_URL = window.location.port === '8000' || window.location.pathname.includes('/static/') 
+            ? ''  // Same origin (integrated mode)
+            : 'http://localhost:8000';  // Separate frontend server
         let civChart = null;
         
         async function analyzePlayer() {
