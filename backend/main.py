@@ -59,12 +59,17 @@ async def get_player_analysis(
         
         # Get recent games
         games_data = await client.get_player_games(profile_id, limit=limit, leaderboard=leaderboard)
-        print(f"DEBUG: Got {len(games_data)} games from API")
+        print(f"DEBUG: Got {len(games_data)} games from API, type: {type(games_data)}")
+        
+        # Debug first game structure
+        if games_data and len(games_data) > 0:
+            print(f"DEBUG: First game type: {type(games_data[0])}")
+            if isinstance(games_data[0], dict):
+                print(f"DEBUG: First game keys: {list(games_data[0].keys())}")
         
         # Parse games
         games = []
         for i, game_data in enumerate(games_data):
-            print(f"DEBUG: Parsing game {i+1}, keys: {list(game_data.keys()) if isinstance(game_data, dict) else 'not dict'}")
             game = client.parse_game(game_data, profile_id)
             if game:
                 games.append(game)

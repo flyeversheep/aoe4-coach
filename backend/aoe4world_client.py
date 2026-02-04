@@ -56,8 +56,7 @@ class AoE4WorldClient:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if self.session:
             await self.session.close()
-        if self.connector:
-            self.connector.close()
+        # Note: connector is closed by the session
     
     async def get_player(self, profile_id: str) -> Optional[Dict[str, Any]]:
         """Get player profile by profile_id or steam_id"""
@@ -84,13 +83,28 @@ class AoE4WorldClient:
         async with self.session.get(url, params=params) as response:
             if response.status == 200:
                 data = await response.json()
-                return data.get("games", [])
+                print(f"DEBUG get_player_games: Response type={type(data)}, keys={list(data.keys()) if isinstance(data, dict) else 'N/A'}")
+                # Handle both formats: list directly or dict with "games" key
+                if isinstance(data, list):
+                    return data
+                elif isinstance(data, dict):
+                    return data.get("games", [])
+                return []
             return []
     
     def parse_game(self, game_data: Dict, profile_id: str) -> Optional[Game]:
         """Parse game data and extract player-specific info"""
         try:
+            # Ensure game_data is a dict
+            if not isinstance(game_data, dict):
+                print(f"DEBUG parse_game: game_data is not dict, type={type(game_data)}")
+                return None
+                
             teams = game_data.get("teams", [])
+            if not teams:
+                print(f"DEBUG parse_game: No teams found in game_data")
+                return None
+                
             print(f"DEBUG parse_game: Found {len(teams)} teams")
             
             # Find the player in teams
@@ -98,7 +112,11 @@ class AoE4WorldClient:
             opponent_info = None
             
             for team in teams:
+                if not isinstance(team, dict):
+                    continue
                 for player in team.get("players", []):
+                    if not isinstance(player, dict):
+                        continue
                     print(f"DEBUG parse_game: Checking player {player.get('profile_id')} vs {profile_id}")
                     if str(player.get("profile_id")) == str(profile_id):
                         player_info = player
