@@ -47,24 +47,36 @@ async def get_player_analysis(
     - limit: Number of recent games to analyze (1-50)
     - leaderboard: Game mode to analyze
     """
+    print(f"DEBUG: Fetching data for profile_id={profile_id}, limit={limit}, leaderboard={leaderboard}")
+    
     async with AoE4WorldClient() as client:
         # Get player profile
         player_data = await client.get_player(profile_id)
+        print(f"DEBUG: Player data: {player_data is not None}")
+        
         if not player_data:
             raise HTTPException(status_code=404, detail="Player not found")
         
         # Get recent games
         games_data = await client.get_player_games(profile_id, limit=limit, leaderboard=leaderboard)
+        print(f"DEBUG: Got {len(games_data)} games from API")
         
         # Parse games
         games = []
-        for game_data in games_data:
+        for i, game_data in enumerate(games_data):
+            print(f"DEBUG: Parsing game {i+1}, keys: {list(game_data.keys()) if isinstance(game_data, dict) else 'not dict'}")
             game = client.parse_game(game_data, profile_id)
             if game:
                 games.append(game)
+                print(f"DEBUG: Successfully parsed game {game.game_id}")
+            else:
+                print(f"DEBUG: Failed to parse game {i+1}")
+        
+        print(f"DEBUG: Successfully parsed {len(games)} games")
         
         # Analyze performance
         analysis = client.analyze_performance(games)
+        print(f"DEBUG: Analysis: {analysis}")
         
         # Generate AI coaching report
         coaching_report = await generate_coaching_report(player_data, analysis, games)
