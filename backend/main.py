@@ -591,6 +591,36 @@ async def list_rubrics():
         print(f"ERROR: Failed to list rubrics: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+def calculate_villager_count(build_order: list, at_time: int) -> int:
+    """
+    Calculate the number of villagers produced by a given time.
+
+    Args:
+        build_order: List of build order items
+        at_time: Time in seconds to count villagers at
+
+    Returns:
+        Number of villagers finished by that time (including starting villagers)
+    """
+    # Starting villagers (all civs start with 6 villagers in AoE4)
+    starting_villagers = 6
+    produced_villagers = 0
+
+    for item in build_order:
+        # Check if this is a villager (by name or icon)
+        name = item.get('name', '').lower()
+        icon = item.get('icon', '').lower()
+
+        if 'villager' in name or 'villager' in icon:
+            # Count finished timestamps before the target time
+            finished_times = item.get('finished', [])
+            for t in finished_times:
+                if t <= at_time:
+                    produced_villagers += 1
+
+    return starting_villagers + produced_villagers
+
+
 async def generate_rubric_coaching(rubric: dict, game_summary: dict, profile_id: str) -> dict:
     """Generate AI coaching analysis comparing game execution to rubric"""
     if not ai_client:
@@ -604,7 +634,13 @@ async def generate_rubric_coaching(rubric: dict, game_summary: dict, profile_id:
         player = game_summary.get("player", {})
         game = game_summary.get("game", {})
         timings = game_summary.get("timings", {}).get("player", {})
-        build_order = game_summary.get("build_order", [])[:20]  # First 20 items
+        full_build_order = game_summary.get("build_order", [])
+        build_order = full_build_order[:20]  # First 20 items for display
+
+        # Calculate actual villager counts
+        villagers_at_10min = calculate_villager_count(full_build_order, 600)  # 10 minutes = 600 seconds
+        castle_age_time = timings.get("castle_age", {}).get("seconds")
+        villagers_at_castle = calculate_villager_count(full_build_order, castle_age_time) if castle_age_time else None
 
         # Extract rubric data
         benchmarks = rubric.get("benchmarks", {})
@@ -656,6 +692,10 @@ ACTUAL TIMINGS:
 - Feudal Age: {timings.get('feudal_age', {}).get('formatted', 'N/A')} ({timings.get('feudal_age', {}).get('seconds', 0)}s)
 - Castle Age: {timings.get('castle_age', {}).get('formatted', 'N/A')} ({timings.get('castle_age', {}).get('seconds', 0)}s)
 - Imperial Age: {timings.get('imperial_age', {}).get('formatted', 'N/A')} ({timings.get('imperial_age', {}).get('seconds', 0)}s)
+
+ACTUAL VILLAGER COUNTS:
+- Villagers at 10min: {villagers_at_10min}
+- Villagers at Castle Age: {villagers_at_castle if villagers_at_castle else 'N/A'}
 
 PERFORMANCE:
 - APM: {player.get('apm', 'N/A')}
