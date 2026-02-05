@@ -24,6 +24,7 @@ ZAI_API_KEY = os.getenv("ZAI_API_KEY", "")
 ZAI_BASE_URL = os.getenv("ZAI_BASE_URL", "https://api.z.ai/api/paas/v4/")  # z.ai API endpoint
 AI_PROVIDER = os.getenv("AI_PROVIDER", "auto")  # auto, openai, or zai
 AI_MODEL = os.getenv("AI_MODEL", "")  # Optional: override default model
+RUBRIC_LIBRARY_PATH = os.getenv("RUBRIC_LIBRARY_PATH", "/Users/feihan/clawd/youtube-rubric-extractor/rubric_library")
 
 # Create SSL context for AoE4 World API (used in aoe4world_client)
 ssl_context = ssl.create_default_context(cafile=certifi.where())
@@ -508,6 +509,357 @@ async def sample_report():
         "ai_generated": True,
         "disclaimer": "🤖 AI-Generated Coaching Advice (Sample)"
     }
+
+# ============================================================================
+# Rubric-Based Coaching Endpoints
+# ============================================================================
+
+def load_rubric(rubric_id: str) -> Optional[dict]:
+    """Load a rubric JSON file by ID"""
+    try:
+        rubric_path = os.path.join(RUBRIC_LIBRARY_PATH, f"{rubric_id}.json")
+        if not os.path.exists(rubric_path):
+            print(f"DEBUG: Rubric file not found: {rubric_path}")
+            return None
+
+        with open(rubric_path, 'r', encoding='utf-8') as f:
+            rubric = json.load(f)
+
+        print(f"DEBUG: Successfully loaded rubric: {rubric_id}")
+        return rubric
+    except Exception as e:
+        print(f"ERROR: Failed to load rubric {rubric_id}: {e}")
+        return None
+
+def extract_all_success_criteria(phases: list) -> list:
+    """Extract all success criteria from rubric phases"""
+    criteria = []
+    for phase in phases:
+        phase_name = phase.get("name", "Unknown")
+        for criterion in phase.get("success_criteria", []):
+            criteria.append(f"{phase_name}: {criterion}")
+    return criteria
+
+def extract_all_common_mistakes(phases: list) -> list:
+    """Extract all common mistakes from rubric phases"""
+    mistakes = []
+    for phase in phases:
+        for mistake_obj in phase.get("common_mistakes", []):
+            mistakes.append({
+                "phase": phase.get("name", "Unknown"),
+                "mistake": mistake_obj.get("mistake", ""),
+                "consequence": mistake_obj.get("consequence", ""),
+                "fix": mistake_obj.get("fix", "")
+            })
+    return mistakes
+
+@app.get("/api/rubrics")
+async def list_rubrics():
+    """List all available rubrics with metadata"""
+    try:
+        if not os.path.exists(RUBRIC_LIBRARY_PATH):
+            raise HTTPException(status_code=500, detail=f"Rubric library not found at {RUBRIC_LIBRARY_PATH}")
+
+        rubrics = []
+        for filename in os.listdir(RUBRIC_LIBRARY_PATH):
+            if filename.endswith('.json'):
+                rubric_id = filename[:-5]  # Remove .json extension
+                rubric = load_rubric(rubric_id)
+                if rubric:
+                    rubrics.append({
+                        "id": rubric.get("id", rubric_id),
+                        "title": rubric.get("title", rubric_id),
+                        "difficulty": rubric.get("difficulty", "unknown"),
+                        "civilizations": rubric.get("civilizations", []),
+                        "archetype": rubric.get("archetype", ""),
+                        "overview": rubric.get("overview", "")
+                    })
+
+        print(f"DEBUG: Found {len(rubrics)} rubrics")
+        return {
+            "success": True,
+            "rubrics": rubrics
+        }
+    except Exception as e:
+        print(f"ERROR: Failed to list rubrics: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+async def generate_rubric_coaching(rubric: dict, game_summary: dict, profile_id: str) -> dict:
+    """Generate AI coaching analysis comparing game execution to rubric"""
+    if not ai_client:
+        return {
+            "error": "AI client not configured",
+            "overall_assessment": "AI coaching requires API key configuration."
+        }
+
+    try:
+        # Extract game metrics
+        player = game_summary.get("player", {})
+        game = game_summary.get("game", {})
+        timings = game_summary.get("timings", {}).get("player", {})
+        build_order = game_summary.get("build_order", [])[:20]  # First 20 items
+
+        # Extract rubric data
+        benchmarks = rubric.get("benchmarks", {})
+        phases = rubric.get("phases", [])
+        success_criteria = extract_all_success_criteria(phases)
+        common_mistakes = extract_all_common_mistakes(phases)
+
+        # Format build order for prompt
+        build_order_str = "\n".join([
+            f"  - {item.get('icon', 'Unknown').split('/')[-1].replace('_', ' ')} at {(item.get('finished') or item.get('constructed') or ['-'])[0]}s"
+            for item in build_order[:20]
+        ])
+
+        # Construct comprehensive prompt
+        prompt = f"""You are an expert Age of Empires IV coach. Compare the player's actual game execution against this professional build order rubric.
+
+RUBRIC: {rubric.get('title', 'Unknown')}
+Overview: {rubric.get('overview', '')}
+Archetype: {rubric.get('archetype', '')}
+Difficulty: {rubric.get('difficulty', '')}
+
+RUBRIC BENCHMARKS:
+- Feudal Age: {benchmarks.get('feudal_age', 'N/A')}s ({benchmarks.get('feudal_age', 0) // 60}:{benchmarks.get('feudal_age', 0) % 60:02d})
+- Castle Age: {benchmarks.get('castle_age', 'N/A')}s ({benchmarks.get('castle_age', 0) // 60}:{benchmarks.get('castle_age', 0) % 60:02d})
+- Imperial Age: {benchmarks.get('imperial_age', 'N/A')}s
+- Villagers at 10min: {benchmarks.get('villagers_at_10min', 'N/A')}
+- Villagers at Castle: {benchmarks.get('villagers_at_castle', 'N/A')}
+
+RUBRIC SUCCESS CRITERIA:
+{chr(10).join(f"- {c}" for c in success_criteria[:10])}
+
+RUBRIC COMMON MISTAKES:
+{chr(10).join(f"- {m['mistake']} → {m['consequence']}" for m in common_mistakes[:5])}
+
+PLAYER'S ACTUAL EXECUTION:
+Player: {player.get('name', 'Unknown')}
+Civilization: {player.get('civilization', 'Unknown')}
+Map: {game.get('map', 'Unknown')}
+Result: {player.get('result', 'Unknown')}
+Duration: {game.get('duration_formatted', 'Unknown')}
+
+ACTUAL TIMINGS:
+- Feudal Age: {timings.get('feudal_age', {}).get('formatted', 'N/A')} ({timings.get('feudal_age', {}).get('seconds', 0)}s)
+- Castle Age: {timings.get('castle_age', {}).get('formatted', 'N/A')} ({timings.get('castle_age', {}).get('seconds', 0)}s)
+- Imperial Age: {timings.get('imperial_age', {}).get('formatted', 'N/A')} ({timings.get('imperial_age', {}).get('seconds', 0)}s)
+
+PERFORMANCE:
+- APM: {player.get('apm', 'N/A')}
+- Resources Gathered: {player.get('resources_gathered', 'N/A')}
+- Resources Spent: {player.get('resources_spent', 'N/A')}
+
+BUILD ORDER (first 20 items):
+{build_order_str}
+
+TASK:
+Compare the player's execution against the rubric and provide:
+
+1. Overall Assessment (2-3 sentences summarizing execution quality)
+2. Benchmark Comparison (compare expected vs actual timings with ratings)
+3. Execution Mistakes (specific errors with evidence from the game data)
+4. Success Criteria Evaluation (which criteria were met/missed)
+5. Improvement Suggestions (3-5 prioritized actionable items)
+6. Open-ended Strategic Advice (2-3 paragraphs of deeper insights)
+
+IMPORTANT:
+- Respond in ENGLISH only
+- Output ONLY valid JSON, no additional text
+- Be specific and use evidence from the game data
+- Rate benchmarks as "excellent", "good", "average", "poor", or "very_poor"
+- If civilization doesn't match rubric, note it but still provide useful analysis
+
+JSON FORMAT:
+{{
+  "overall_assessment": "2-3 sentences...",
+  "benchmark_comparison": [
+    {{
+      "metric": "Feudal Age",
+      "expected": "5:00",
+      "actual": "5:15",
+      "delta_seconds": 15,
+      "rating": "good"
+    }}
+  ],
+  "execution_mistakes": [
+    {{
+      "mistake": "Specific mistake...",
+      "evidence": "Evidence from game data...",
+      "consequence": "What this caused...",
+      "fix": "How to fix it..."
+    }}
+  ],
+  "success_criteria_evaluation": [
+    {{
+      "criterion": "Zero TC idle time",
+      "met": true,
+      "notes": "Explanation..."
+    }}
+  ],
+  "improvement_suggestions": ["Suggestion 1...", "Suggestion 2...", "Suggestion 3..."],
+  "open_ended_advice": "2-3 paragraphs of strategic advice..."
+}}"""
+
+        # Determine model
+        if AI_MODEL:
+            model = AI_MODEL
+        elif active_provider == "zai":
+            model = "glm-4.6"
+        else:
+            model = "gpt-4o-mini"
+
+        print(f"DEBUG: Calling {active_provider} API for rubric coaching with model {model}")
+
+        # Prepare API call
+        api_params = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": "You are an expert AoE IV coach providing detailed, data-driven analysis in English. Always respond with valid JSON only."},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.7,
+            "max_tokens": 4000
+        }
+
+        if active_provider == "zai":
+            api_params["extra_body"] = {"thinking": {"type": "disabled"}}
+
+        response = ai_client.chat.completions.create(**api_params)
+
+        content = response.choices[0].message.content
+        if not content and hasattr(response.choices[0].message, 'reasoning_content'):
+            content = response.choices[0].message.reasoning_content
+
+        print(f"DEBUG: AI response length: {len(content) if content else 0}")
+
+        if not content:
+            return {
+                "error": "Empty AI response",
+                "overall_assessment": "Failed to generate coaching analysis."
+            }
+
+        # Parse JSON response
+        try:
+            parsed = json.loads(content)
+            return parsed
+        except json.JSONDecodeError as e:
+            print(f"ERROR: Failed to parse AI response as JSON: {e}")
+            return {
+                "error": "Failed to parse AI response",
+                "overall_assessment": "AI returned invalid response format.",
+                "raw_response": content[:500]
+            }
+
+    except Exception as e:
+        print(f"ERROR: Rubric coaching generation failed: {e}")
+        import traceback
+        print(traceback.format_exc())
+        return {
+            "error": f"Coaching generation failed: {str(e)}",
+            "overall_assessment": "An error occurred during analysis."
+        }
+
+@app.post("/api/game/{profile_id}/{game_id}/coaching")
+async def generate_game_coaching(
+    profile_id: str,
+    game_id: str,
+    rubric_id: str = Query(..., description="Rubric ID to use for coaching"),
+    sig: Optional[str] = Query(None, description="Optional signature for private games")
+):
+    """
+    Generate AI coaching for a specific game using a rubric
+
+    - profile_id: Player's profile ID
+    - game_id: Game ID to analyze
+    - rubric_id: ID of rubric to use for comparison
+    - sig: Optional signature for authentication
+    """
+    print(f"DEBUG: Generating coaching for game {game_id} with rubric {rubric_id}")
+
+    # Load rubric
+    rubric = load_rubric(rubric_id)
+    if not rubric:
+        raise HTTPException(status_code=404, detail=f"Rubric not found: {rubric_id}")
+
+    # Fetch game data
+    async with AoE4WorldClient() as client:
+        summary_data = await client.get_game_summary(profile_id, game_id, sig)
+
+        if not summary_data:
+            raise HTTPException(status_code=404, detail="Game not found or not accessible")
+
+        game_summary_obj = client.parse_game_summary(summary_data, profile_id)
+
+        if not game_summary_obj:
+            raise HTTPException(status_code=500, detail="Failed to parse game data")
+
+        # Format game summary for AI
+        def format_time(seconds):
+            if seconds is None:
+                return None
+            mins = seconds // 60
+            secs = seconds % 60
+            return f"{mins}:{secs:02d}"
+
+        game_summary = {
+            "game": {
+                "game_id": game_summary_obj.game_id,
+                "map": game_summary_obj.map_name,
+                "duration": game_summary_obj.duration,
+                "duration_formatted": format_time(game_summary_obj.duration),
+                "win_reason": game_summary_obj.win_reason
+            },
+            "player": {
+                "name": game_summary_obj.player_name,
+                "civilization": game_summary_obj.player_civ,
+                "result": game_summary_obj.player_result,
+                "apm": game_summary_obj.player_apm,
+                "resources_gathered": game_summary_obj.total_resources_gathered,
+                "resources_spent": game_summary_obj.total_resources_spent
+            },
+            "timings": {
+                "player": {
+                    "feudal_age": {
+                        "seconds": game_summary_obj.feudal_age_time,
+                        "formatted": format_time(game_summary_obj.feudal_age_time)
+                    },
+                    "castle_age": {
+                        "seconds": game_summary_obj.castle_age_time,
+                        "formatted": format_time(game_summary_obj.castle_age_time)
+                    },
+                    "imperial_age": {
+                        "seconds": game_summary_obj.imperial_age_time,
+                        "formatted": format_time(game_summary_obj.imperial_age_time)
+                    }
+                }
+            },
+            "build_order": game_summary_obj.build_order
+        }
+
+        # Generate coaching
+        coaching = await generate_rubric_coaching(rubric, game_summary, profile_id)
+
+        # Check for civilization mismatch
+        player_civ = game_summary_obj.player_civ.lower() if game_summary_obj.player_civ else ""
+        rubric_civs = [c.lower() for c in rubric.get("civilizations", [])]
+        civ_mismatch = player_civ and rubric_civs and player_civ not in rubric_civs
+
+        return {
+            "success": True,
+            "rubric": {
+                "id": rubric.get("id"),
+                "title": rubric.get("title"),
+                "difficulty": rubric.get("difficulty"),
+                "civilizations": rubric.get("civilizations")
+            },
+            "game": {
+                "player_civilization": game_summary_obj.player_civ,
+                "result": game_summary_obj.player_result
+            },
+            "civ_mismatch": civ_mismatch,
+            "coaching": coaching,
+            "ai_provider": active_provider if ai_client else None
+        }
 
 if __name__ == "__main__":
     import uvicorn
