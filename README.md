@@ -2,6 +2,8 @@
 
 AI-powered post-game analysis for Age of Empires IV using AoE4 World API.
 
+Try it in https://jarvis-turfiest-soon.ngrok-free.dev/
+
 ## Features
 
 - Input your Steam ID / Profile ID to fetch match history
