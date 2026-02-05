@@ -593,18 +593,19 @@ async def list_rubrics():
 
 def calculate_villager_count(build_order: list, at_time: int) -> int:
     """
-    Calculate the number of villagers produced by a given time.
+    Calculate the number of villagers by a given time.
 
     Args:
         build_order: List of build order items
         at_time: Time in seconds to count villagers at
 
     Returns:
-        Number of villagers finished by that time (including starting villagers)
+        Number of villagers finished by that time
+
+    Note: The build order data already includes starting villagers
+    as finished at time 0, so we don't add them separately.
     """
-    # Starting villagers (all civs start with 6 villagers in AoE4)
-    starting_villagers = 6
-    produced_villagers = 0
+    villager_count = 0
 
     for item in build_order:
         # Check if this is a villager (by name or icon)
@@ -612,13 +613,13 @@ def calculate_villager_count(build_order: list, at_time: int) -> int:
         icon = item.get('icon', '').lower()
 
         if 'villager' in name or 'villager' in icon:
-            # Count finished timestamps before the target time
+            # Count finished timestamps at or before the target time
             finished_times = item.get('finished', [])
             for t in finished_times:
                 if t <= at_time:
-                    produced_villagers += 1
+                    villager_count += 1
 
-    return starting_villagers + produced_villagers
+    return villager_count
 
 
 async def generate_rubric_coaching(rubric: dict, game_summary: dict, profile_id: str) -> dict:
