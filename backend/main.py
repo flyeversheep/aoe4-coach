@@ -669,12 +669,19 @@ Overview: {rubric.get('overview', '')}
 Archetype: {rubric.get('archetype', '')}
 Difficulty: {rubric.get('difficulty', '')}
 
-RUBRIC BENCHMARKS:
+RUBRIC BENCHMARKS (these are landmark START times, i.e., when player clicks to age up):
 - Feudal Age: {benchmarks.get('feudal_age', 'N/A')}s ({benchmarks.get('feudal_age', 0) // 60}:{benchmarks.get('feudal_age', 0) % 60:02d})
 - Castle Age: {benchmarks.get('castle_age', 'N/A')}s ({benchmarks.get('castle_age', 0) // 60}:{benchmarks.get('castle_age', 0) % 60:02d})
 - Imperial Age: {benchmarks.get('imperial_age', 'N/A')}s
 - Villagers at 10min: {benchmarks.get('villagers_at_10min', 'N/A')}
 - Villagers at Castle: {benchmarks.get('villagers_at_castle', 'N/A')}
+
+IMPORTANT TIMING NOTE:
+The rubric benchmarks above are landmark START times (when player clicks to age up).
+The actual timings below are landmark FINISH times (when the age completes).
+Landmarks take time to build (~90s for Feudal, ~120s for Castle, ~180s for Imperial).
+When comparing, use the NEXT age's benchmark as the expected FINISH time for the current age.
+For example: If rubric says "Castle Age: 480s", that means the Feudal landmark should FINISH around 480s.
 
 RUBRIC SUCCESS CRITERIA:
 {chr(10).join(f"- {c}" for c in success_criteria[:10])}
@@ -689,7 +696,7 @@ Map: {game.get('map', 'Unknown')}
 Result: {player.get('result', 'Unknown')}
 Duration: {game.get('duration_formatted', 'Unknown')}
 
-ACTUAL TIMINGS:
+ACTUAL TIMINGS (these are landmark FINISH times, i.e., when the age completed):
 - Feudal Age: {timings.get('feudal_age', {}).get('formatted', 'N/A')} ({timings.get('feudal_age', {}).get('seconds', 0)}s)
 - Castle Age: {timings.get('castle_age', {}).get('formatted', 'N/A')} ({timings.get('castle_age', {}).get('seconds', 0)}s)
 - Imperial Age: {timings.get('imperial_age', {}).get('formatted', 'N/A')} ({timings.get('imperial_age', {}).get('seconds', 0)}s)
