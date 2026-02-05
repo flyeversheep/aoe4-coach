@@ -1,4 +1,4 @@
-# AoE IV AI Coach - MVP
+# AoE IV AI Coach
 
 AI-powered post-game analysis for Age of Empires IV using AoE4 World API.
 
