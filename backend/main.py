@@ -17,6 +17,7 @@ import httpx
 from openai import OpenAI
 
 from aoe4world_client import AoE4WorldClient
+from aoe4_data import aoe4_data
 
 # Config - Support multiple AI providers
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
@@ -72,6 +73,12 @@ import os
 frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")
 if os.path.exists(frontend_path):
     app.mount("/static", StaticFiles(directory=frontend_path), name="static")
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Load AoE4 data on startup for name lookups"""
+    await aoe4_data.load()
 
 @app.get("/")
 async def root():
@@ -458,8 +465,8 @@ async def get_game_build_order(
                     }
                 }
             },
-            "build_order": game_summary.build_order,
-            "opponent_build_order": game_summary.opponent_build_order,
+            "build_order": aoe4_data.enrich_build_order(game_summary.build_order),
+            "opponent_build_order": aoe4_data.enrich_build_order(game_summary.opponent_build_order),
             "raw_data": summary_data  # Include raw data for debugging/future use
         }
 
@@ -605,9 +612,15 @@ async def generate_rubric_coaching(rubric: dict, game_summary: dict, profile_id:
         success_criteria = extract_all_success_criteria(phases)
         common_mistakes = extract_all_common_mistakes(phases)
 
-        # Format build order for prompt
+        # Format build order for prompt (use enriched name if available)
+        def get_item_name(item):
+            if item.get('name'):
+                return item['name']
+            icon = item.get('icon', 'Unknown')
+            return icon.split('/')[-1].replace('_', ' ')
+
         build_order_str = "\n".join([
-            f"  - {item.get('icon', 'Unknown').split('/')[-1].replace('_', ' ')} at {(item.get('finished') or item.get('constructed') or ['-'])[0]}s"
+            f"  - {get_item_name(item)} at {(item.get('finished') or item.get('constructed') or ['-'])[0]}s"
             for item in build_order[:20]
         ])
 
@@ -833,7 +846,7 @@ async def generate_game_coaching(
                     }
                 }
             },
-            "build_order": game_summary_obj.build_order
+            "build_order": aoe4_data.enrich_build_order(game_summary_obj.build_order)
         }
 
         # Generate coaching
