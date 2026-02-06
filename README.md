@@ -8,23 +8,12 @@ AI-powered post-game analysis for Age of Empires IV using AoE4 World API.
 
 ## ✨ Features
 
-### Core Analysis
 - **Player Profile Analysis** - Input Steam ID / Profile ID to fetch match history
 - **AI Coaching Reports** - GPT-4o powered personalized improvement tips
+- **Build Order Analysis** - View detailed build sequences with timestamps
+- **Rubric-Based Coaching** - Compare execution against professional build orders from [youtube-rubric-extractor](https://github.com/flyeversheep/youtube-rubric-extractor)
 - **Performance Tracking** - Win rates, rating trends, civilization stats
-- **Match History** - Recent games with detailed opponent info
-
-### Build Order Analysis
-- **Detailed Build Orders** - View your exact build sequence with timestamps
 - **Age Up Timing Comparison** - Compare your timings vs opponents
-- **Side-by-side View** - Your build order vs opponent's
-- **APM & Resource Stats** - Performance metrics for each game
-
-### Rubric-Based Coaching ⭐ New
-- **Professional Build Order Comparison** - Compare your execution against pro rubrics
-- **Benchmark Analysis** - Age up times, villager counts vs optimal targets
-- **Mistake Detection** - AI identifies execution errors with evidence
-- **Actionable Feedback** - Specific improvement suggestions with fixes
 
 ### AI Providers
 - **OpenAI** - GPT-4o-mini (default)
