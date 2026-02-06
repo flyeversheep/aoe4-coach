@@ -6,6 +6,14 @@ AI-powered post-game analysis for Age of Empires IV using AoE4 World API.
 
 ---
 
+## 🎬 Demo
+
+![AoE IV AI Coach Demo](docs/demo.gif)
+
+*AI-powered post-game analysis with build order coaching*
+
+---
+
 ## ✨ Features
 
 - **Player Profile Analysis** - Input Steam ID / Profile ID to fetch match history
