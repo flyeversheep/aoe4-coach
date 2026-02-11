@@ -558,7 +558,7 @@ def extract_all_success_criteria(phases: list) -> list:
     criteria = []
     for phase in phases:
         phase_name = phase.get("name", "Unknown")
-        for criterion in phase.get("success_criteria", []):
+        for criterion in (phase.get("success_criteria") or []):
             criteria.append(f"{phase_name}: {criterion}")
     return criteria
 
@@ -566,7 +566,7 @@ def extract_all_common_mistakes(phases: list) -> list:
     """Extract all common mistakes from rubric phases"""
     mistakes = []
     for phase in phases:
-        for mistake_obj in phase.get("common_mistakes", []):
+        for mistake_obj in (phase.get("common_mistakes") or []):
             mistakes.append({
                 "phase": phase.get("name", "Unknown"),
                 "mistake": mistake_obj.get("mistake", ""),
@@ -624,14 +624,14 @@ def calculate_villager_count(build_order: list, at_time: int) -> int:
 
     for item in build_order:
         # Check if this is a villager (by name or icon)
-        name = item.get('name', '').lower()
-        icon = item.get('icon', '').lower()
+        name = (item.get('name') or '').lower()
+        icon = (item.get('icon') or '').lower()
 
         if 'villager' in name or 'villager' in icon:
             # Count finished timestamps at or before the target time
-            finished_times = item.get('finished', [])
+            finished_times = item.get('finished') or []
             for t in finished_times:
-                if t <= at_time:
+                if t is not None and t <= at_time:
                     villager_count += 1
 
     return villager_count
@@ -655,7 +655,7 @@ async def generate_rubric_coaching(rubric: dict, game_summary: dict, profile_id:
 
         # Calculate actual villager counts
         villagers_at_10min = calculate_villager_count(full_build_order, 600)  # 10 minutes = 600 seconds
-        castle_age_time = timings.get("castle_age", {}).get("seconds")
+        castle_age_time = (timings.get("castle_age") or {}).get("seconds")
         villagers_at_castle = calculate_villager_count(full_build_order, castle_age_time) if castle_age_time else None
 
         # Extract rubric data
@@ -685,8 +685,8 @@ Archetype: {rubric.get('archetype', '')}
 Difficulty: {rubric.get('difficulty', '')}
 
 RUBRIC BENCHMARKS (these are landmark START times, i.e., when player clicks to age up):
-- Feudal Age: {benchmarks.get('feudal_age', 'N/A')}s ({benchmarks.get('feudal_age', 0) // 60}:{benchmarks.get('feudal_age', 0) % 60:02d})
-- Castle Age: {benchmarks.get('castle_age', 'N/A')}s ({benchmarks.get('castle_age', 0) // 60}:{benchmarks.get('castle_age', 0) % 60:02d})
+- Feudal Age: {benchmarks.get('feudal_age', 'N/A')}s ({(benchmarks.get('feudal_age') or 0) // 60}:{(benchmarks.get('feudal_age') or 0) % 60:02d})
+- Castle Age: {benchmarks.get('castle_age', 'N/A')}s ({(benchmarks.get('castle_age') or 0) // 60}:{(benchmarks.get('castle_age') or 0) % 60:02d})
 - Imperial Age: {benchmarks.get('imperial_age', 'N/A')}s
 - Villagers at 10min: {benchmarks.get('villagers_at_10min', 'N/A')}
 - Villagers at Castle: {benchmarks.get('villagers_at_castle', 'N/A')}
@@ -712,9 +712,9 @@ Result: {player.get('result', 'Unknown')}
 Duration: {game.get('duration_formatted', 'Unknown')}
 
 ACTUAL TIMINGS (these are landmark FINISH times, i.e., when the age completed):
-- Feudal Age: {timings.get('feudal_age', {}).get('formatted', 'N/A')} ({timings.get('feudal_age', {}).get('seconds', 0)}s)
-- Castle Age: {timings.get('castle_age', {}).get('formatted', 'N/A')} ({timings.get('castle_age', {}).get('seconds', 0)}s)
-- Imperial Age: {timings.get('imperial_age', {}).get('formatted', 'N/A')} ({timings.get('imperial_age', {}).get('seconds', 0)}s)
+- Feudal Age: {(timings.get('feudal_age') or {}).get('formatted', 'N/A')} ({(timings.get('feudal_age') or {}).get('seconds', 0)}s)
+- Castle Age: {(timings.get('castle_age') or {}).get('formatted', 'N/A')} ({(timings.get('castle_age') or {}).get('seconds', 0)}s)
+- Imperial Age: {(timings.get('imperial_age') or {}).get('formatted', 'N/A')} ({(timings.get('imperial_age') or {}).get('seconds', 0)}s)
 
 ACTUAL VILLAGER COUNTS:
 - Villagers at 10min: {villagers_at_10min}
@@ -917,7 +917,7 @@ async def generate_game_coaching(
 
         # Check for civilization mismatch
         player_civ = game_summary_obj.player_civ.lower() if game_summary_obj.player_civ else ""
-        rubric_civs = [c.lower() for c in rubric.get("civilizations", [])]
+        rubric_civs = [c.lower() for c in (rubric.get("civilizations") or [])]
         civ_mismatch = player_civ and rubric_civs and player_civ not in rubric_civs
 
         return {
