@@ -4,6 +4,7 @@ Uses AoE4 World API to fetch player data and generate AI coaching reports
 """
 import os
 import json
+import re
 from typing import Optional
 from datetime import datetime
 
@@ -260,7 +261,7 @@ Format as JSON with these keys: rating, strengths, improvements, civ_recommendat
     if AI_MODEL:
         model = AI_MODEL
     elif active_provider == "zai":
-        model = "glm-4.6"  # z.ai flagship model (GLM-4.6, not 4.7)
+        model = "glm-5"
     else:
         model = "gpt-4o-mini"  # OpenAI default model
 
@@ -302,7 +303,7 @@ Format as JSON with these keys: rating, strengths, improvements, civ_recommendat
             return {"error": "Empty response from AI", "fallback": generate_template_report(analysis)}
 
         try:
-            parsed_response = json.loads(content)
+            parsed_response = json.loads(clean_json_response(content))
             # Normalize response format to ensure arrays where expected
             return normalize_coaching_report(parsed_response)
         except json.JSONDecodeError:
@@ -318,6 +319,20 @@ Format as JSON with these keys: rating, strengths, improvements, civ_recommendat
             "error": f"AI analysis failed: {str(e)}",
             "fallback": generate_template_report(analysis)
         }
+
+def clean_json_response(text: str) -> str:
+    """Clean LLM JSON responses: strip markdown fences and fix trailing commas."""
+    stripped = text.strip()
+    if stripped.startswith("```"):
+        # Remove opening fence (```json or ```)
+        first_newline = stripped.index("\n")
+        stripped = stripped[first_newline + 1:]
+        # Remove closing fence
+        if stripped.endswith("```"):
+            stripped = stripped[:-3].strip()
+    # Remove trailing commas before } or ] (common LLM mistake)
+    stripped = re.sub(r",\s*([}\]])", r"\1", stripped)
+    return stripped
 
 def generate_template_report(analysis: dict) -> dict:
     """Generate a template coaching report without AI"""
@@ -765,7 +780,7 @@ JSON FORMAT:
         if AI_MODEL:
             model = AI_MODEL
         elif active_provider == "zai":
-            model = "glm-4.6"
+            model = "glm-5"
         else:
             model = "gpt-4o-mini"
 
@@ -801,7 +816,7 @@ JSON FORMAT:
 
         # Parse JSON response
         try:
-            parsed = json.loads(content)
+            parsed = json.loads(clean_json_response(content))
             return parsed
         except json.JSONDecodeError as e:
             print(f"ERROR: Failed to parse AI response as JSON: {e}")
