@@ -26,7 +26,7 @@ ZAI_API_KEY = os.getenv("ZAI_API_KEY", "")
 ZAI_BASE_URL = os.getenv("ZAI_BASE_URL", "https://api.z.ai/api/paas/v4/")  # z.ai API endpoint
 AI_PROVIDER = os.getenv("AI_PROVIDER", "auto")  # auto, openai, or zai
 AI_MODEL = os.getenv("AI_MODEL", "")  # Optional: override default model
-RUBRIC_LIBRARY_PATH = os.getenv("RUBRIC_LIBRARY_PATH", "/Users/feihan/clawd/youtube-rubric-extractor/rubric_library")
+RUBRIC_LIBRARY_PATH = os.getenv("RUBRIC_LIBRARY_PATH", os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "rubric_library"))
 
 # Create SSL context for AoE4 World API (used in aoe4world_client)
 ssl_context = ssl.create_default_context(cafile=certifi.where())
