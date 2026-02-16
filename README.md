@@ -26,6 +26,7 @@ AI-powered post-game analysis for Age of Empires IV using AoE4 World API.
 
 ### 🤖 Claude Code Agent Coaching (NEW)
 - **`/analyze-build-order`** - Paste an AoE4 World game URL and get deep coaching analysis
+- **`/compare-with-pro`** - Compare your game against a pro player's game with the same civ
 - Agent automatically fetches your game data, matches the best rubric, and generates a detailed phase-by-phase coaching report
 - Identifies patterns like TC idle time, resource floating, missed timings
 - Compares your execution against pro build orders with specific, actionable feedback
@@ -34,6 +35,12 @@ AI-powered post-game analysis for Age of Empires IV using AoE4 World API.
 ```bash
 # In the project directory, launch Claude Code and run:
 > /analyze-build-order https://aoe4world.com/players/17689761/games/182257348?sig=...
+
+# Compare against a specific pro player:
+> /compare-with-pro https://aoe4world.com/players/17689761/games/182257348?sig=... --pro Beasty
+
+# Auto-find a reference player 1-2 tiers above you:
+> /compare-with-pro https://aoe4world.com/players/17689761/games/182257348?sig=...
 ```
 
 ### AI Providers
@@ -126,12 +133,19 @@ claude
 > /analyze-build-order https://aoe4world.com/players/17689761/games/182257348?sig=8eba51...
 ```
 
-The agent will:
+**`/analyze-build-order`** — The agent will:
 1. Parse the URL and fetch game data from AoE4 World API
 2. Auto-select the best matching rubric based on your civ and strategy
 3. Compare your build order against the pro rubric phase by phase
 4. Identify weakness patterns (TC idle time, resource floating, etc.)
 5. Generate a detailed coaching report in `analysis/`
+
+**`/compare-with-pro`** — The agent will:
+1. Fetch your game data and identify your civ + strategy
+2. Find a reference pro player's game (specified or auto-selected 1-2 tiers up)
+3. Compare build orders, timings, economy, and military side by side
+4. Identify the biggest pattern differences between you and the pro
+5. Generate actionable suggestions based on what the pro does differently
 
 ---
 
@@ -182,7 +196,8 @@ Returns available build order rubrics for coaching.
 aoe4-coach/
 ├── .claude/
 │   └── commands/
-│       └── analyze-build-order.md   # Claude Code coaching command
+│       ├── analyze-build-order.md   # Rubric-based coaching
+│       └── compare-with-pro.md     # Pro player comparison
 ├── backend/
 │   ├── main.py                      # FastAPI app + API endpoints
 │   ├── aoe4world_client.py          # AoE4 World API client

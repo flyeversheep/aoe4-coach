@@ -89,6 +89,7 @@ Available rubrics (English civ):
 Custom slash commands in `.claude/commands/`:
 
 - `/analyze-build-order` — Compare a player's game against a pro rubric. Fetches game data from AoE4 World API, parses build order, and generates detailed coaching feedback.
+- `/compare-with-pro` — Compare a player's game against a higher-ranked player's game with the same civ. Optionally specify a pro with `--pro Beasty`. Auto-finds reference games 1-2 tiers above.
 
 ### Player Info
 
