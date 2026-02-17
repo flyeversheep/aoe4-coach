@@ -81,6 +81,66 @@ For each phase in the rubric, compare:
 - Look for population blocks (gaps in all production)
 - Detect strategic pivots (where player deviated from rubric)
 
+**Military Composition Analysis:**
+- Compare player's unit types vs opponent's unit types
+- Calculate total military units for both sides
+- Compare military scores (from game.final_score)
+- Identify unit type imbalances (e.g., too many different unit types vs focused composition)
+- Check for siege weapon count differences
+- Analyze why player's army may be weaker (分散 vs 专注, economy issues, etc.)
+
+Use this script template to analyze military composition:
+
+```bash
+python3 -c "
+import asyncio
+from aoe4world_client import AoE4WorldClient
+
+async def analyze_military():
+    async with AoE4WorldClient() as client:
+        summary = await client.get_game_summary(profile_id='PROFILE_ID', game_id='GAME_ID', sig='SIG')
+        game = client.parse_game_summary(summary, profile_id='PROFILE_ID')
+
+        # Parse military units (excluding vills and scouts)
+        player_units = {}
+        opponent_units = {}
+
+        for bo in game.build_order:
+            icon = bo.get('icon', '')
+            unit_type = bo.get('type', '')
+            finished = bo.get('finished', [])
+            if unit_type == 'Unit' and 'villager' not in icon.lower() and 'scout' not in icon.lower():
+                unit_name = icon.split('/')[-1]
+                player_units[unit_name] = len(finished)
+
+        for bo in game.opponent_build_order:
+            icon = bo.get('icon', '')
+            unit_type = bo.get('type', '')
+            finished = bo.get('finished', [])
+            if unit_type == 'Unit' and 'villager' not in icon.lower() and 'scout' not in icon.lower():
+                unit_name = icon.split('/')[-1]
+                opponent_units[unit_name] = len(finished)
+
+        # Count by category
+        player_ranged = sum([v for k, v in player_units.items() if 'archer' in k or 'crossbow' in k])
+        opp_ranged = sum([v for k, v in opponent_units.items() if 'archer' in k or 'crossbow' in k])
+        player_cavalry = sum([v for k, v in player_units.items() if 'knight' in k or 'horseman' in k])
+        opp_cavalry = sum([v for k, v in opponent_units.items() if 'knight' in k or 'horseman' in k])
+        player_infantry = sum([v for k, v in player_units.items() if 'manatarms' in k or 'spearman' in k])
+        opp_infantry = sum([v for k, v in opponent_units.items() if 'manatarms' in k or 'spearman' in k])
+        player_siege = sum([v for k, v in player_units.items() if 'trebuchet' in k or 'ram' in k or 'ribauldequin' in k])
+        opp_siege = sum([v for k, v in opponent_units.items() if 'trebuchet' in k or 'ram' in k or 'ribauldequin' in k])
+
+        print(f'Player total: {sum(player_units.values())} vs Opponent: {sum(opponent_units.values())}')
+        print(f'Ranged: {player_ranged} vs {opp_ranged}')
+        print(f'Cavalry: {player_cavalry} vs {opp_cavalry}')
+        print(f'Infantry: {player_infantry} vs {opp_infantry}')
+        print(f'Siege: {player_siege} vs {opp_siege}')
+
+asyncio.run(analyze_military())
+"
+```
+
 ### 4. Generate Coaching Report
 
 Write the report to `analysis/` directory. Format:
@@ -125,6 +185,13 @@ Write the report to `analysis/` directory. Format:
 - Gather rate: X resources/min
 - Resource floating: X (food/wood/gold)
 - Efficiency: X%
+
+## ⚔️ Military Composition Analysis
+- Total military units: Player X vs Opponent Y
+- Military score: Player X vs Opponent Y
+- Unit type breakdown (ranged/cavalry/infantry/siege)
+- Key unit type differences
+- Analysis: Why player's army is weaker/stronger (composition focus, economy issues, etc.)
 ```
 
 ### 5. Summary
