@@ -69,6 +69,61 @@ def fetch_game_summary(player_id, game_id, sig):
     return fetch_json(url)
 
 
+def find_reference_games(player_id, rating_diff_min=30, rating_diff_max=200, limit=50):
+    """Find games where the player lost to a higher-rated opponent.
+    These are ideal reference games: the opponent's build order is accessible
+    via the player's own sig, and represents 'next level' play."""
+    data = list_games(player_id, limit=limit)
+    refs = []
+    for g in data["games"]:
+        p = g.get("player") or {}
+        o = g.get("opponent") or {}
+        p_rating = p.get("rating") or 0
+        o_rating = o.get("rating") or 0
+        diff = o_rating - p_rating
+        if p.get("result") == "loss" and rating_diff_min <= diff <= rating_diff_max:
+            refs.append({
+                "game_id": g["game_id"],
+                "map": g["map"],
+                "duration": g["duration"],
+                "player_civ": p.get("civilization"),
+                "player_rating": p_rating,
+                "opponent_name": o.get("name"),
+                "opponent_civ": o.get("civilization"),
+                "opponent_rating": o_rating,
+                "rating_diff": diff,
+            })
+    return refs
+
+
+def extract_comparison(summary, player_id):
+    """Extract both players' build orders from a game summary for comparison."""
+    players = summary.get("players", [])
+    mine = None
+    theirs = None
+    for p in players:
+        pid = p.get("profileId") or p.get("profile_id")
+        bo = p.get("buildOrder") or p.get("build_order", [])
+        info = {
+            "name": p.get("name"),
+            "profile_id": pid,
+            "civilization": p.get("civilization"),
+            "build_order_items": len(bo),
+            "build_order": bo,
+        }
+        # Extract villager timings
+        for item in bo:
+            icon = item.get("icon", "")
+            if "villager" in icon:
+                info["villager_finished_times"] = item.get("finished", [])
+                break
+        if pid == player_id:
+            mine = info
+        else:
+            theirs = info
+    return {"player": mine, "opponent": theirs}
+
+
 def load_benchmarks():
     with open(BENCHMARKS_PATH) as f:
         return json.load(f)
@@ -83,12 +138,41 @@ def main():
     parser.add_argument("--civ", help="Filter by civilization")
     parser.add_argument("--limit", type=int, default=10, help="Number of games to list")
     parser.add_argument("--benchmarks", action="store_true", help="Print pro benchmarks")
+    parser.add_argument("--find-refs", action="store_true", help="Find reference games (losses to higher-rated opponents)")
+    parser.add_argument("--compare", action="store_true", help="Extract both players' build orders for comparison")
     parser.add_argument("--json", action="store_true", help="Output raw JSON")
     args = parser.parse_args()
 
     if args.benchmarks:
         data = load_benchmarks()
         print(json.dumps(data, indent=2))
+        return
+
+    if args.find_refs:
+        if not args.player_id:
+            print("Error: --player-id required", file=sys.stderr)
+            sys.exit(1)
+        refs = find_reference_games(args.player_id, limit=args.limit)
+        if args.json:
+            print(json.dumps(refs, indent=2))
+        else:
+            print(f"Reference games (losses to higher-rated opponents):\n")
+            for r in refs:
+                print(f"  Game {r['game_id']} | {r['map']} | {r['duration']}s")
+                print(f"    You ({r['player_civ']}, {r['player_rating']}) vs "
+                      f"{r['opponent_name']} ({r['opponent_civ']}, {r['opponent_rating']}) [+{r['rating_diff']}]")
+                print()
+            if not refs:
+                print("  No reference games found. Try increasing --limit.")
+        return
+
+    if args.compare:
+        if not (args.player_id and args.game_id and args.sig):
+            print("Error: --player-id, --game-id, and --sig required for --compare", file=sys.stderr)
+            sys.exit(1)
+        summary = fetch_game_summary(args.player_id, args.game_id, args.sig)
+        comparison = extract_comparison(summary, args.player_id)
+        print(json.dumps(comparison, indent=2))
         return
 
     if args.list_games:
