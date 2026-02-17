@@ -84,6 +84,31 @@ Available rubrics (English civ):
 - `2tc_white_tower_english_valdy_2026.json` — White Tower 2 TC variant
 - `stable_king_opener_english_valdy.json` — Stable King opener
 
+## Helper Scripts
+
+### `scripts/fetch_game_data.py`
+Python script to fetch game data from AoE4 World API. Handles SSL, pagination, and data formatting.
+
+```bash
+# List recent games for a player
+python3 scripts/fetch_game_data.py --player-id 17689761 --list-games --civ english --limit 5
+
+# Fetch full game summary (requires sig from AoE4 World URL)
+python3 scripts/fetch_game_data.py --player-id 17689761 --game-id 182257348 --sig <sig>
+
+# Load pro-level benchmarks
+python3 scripts/fetch_game_data.py --benchmarks
+```
+
+### `reference_data/english_pro_benchmarks.json`
+Curated pro-level English benchmarks from Beasty (2200+), community guides, and AoE4 World stats. Includes:
+- Build order templates (fast castle, longbow rush, 2TC boom, stable king opener)
+- Per-tier benchmarks (pro, diamond, gold)
+- Common mistakes by rating tier
+- Beasty's recent English game metadata with Twitch VOD links
+
+**Note:** AoE4 World's game summary API requires a `sig` parameter (server-side HMAC). Only the player's own games are accessible via sig from the profile URL. Pro player build order details require watching their Twitch VODs.
+
 ## Claude Code Coaching Commands
 
 Custom slash commands in `.claude/commands/`:

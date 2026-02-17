@@ -1,0 +1,209 @@
+{
+  "meta": {
+    "description": "Pro-level English civilization benchmarks compiled from top player games, guides, and community data",
+    "sources": [
+      "Beasty (2200+ rating) - Twitch VODs and YouTube guides",
+      "AoE4 World statistics",
+      "Community build order guides (AoE4Labs, Reddit)"
+    ],
+    "last_updated": "2026-02-17",
+    "note": "These are reference benchmarks, not from a single game. Represents consistent pro-level execution."
+  },
+  "build_orders": {
+    "fast_castle": {
+      "name": "English Fast Castle (Council Hall → Keep)",
+      "description": "Standard English boom into Castle Age with Council Hall for Longbow production",
+      "difficulty": "intermediate",
+      "benchmarks": {
+        "feudal_age_time": "3:50-4:10",
+        "castle_age_time": "7:30-8:30",
+        "villager_count_at_feudal": 17,
+        "villager_count_at_castle": 30,
+        "villager_count_at_10min": 35,
+        "continuous_villager_production": true,
+        "max_idle_tc_time_seconds": 5
+      },
+      "build_sequence": [
+        {"time": "0:00", "action": "Queue 2 villagers, rally 6 to sheep"},
+        {"time": "0:00-0:30", "action": "Scout finds sheep, 1 vill builds house then to food"},
+        {"time": "0:40", "action": "7th vill to gold (need 200 gold for Feudal)"},
+        {"time": "1:00", "action": "8th vill to gold"},
+        {"time": "1:20-2:00", "action": "Remaining vills to food (sheep/berries)"},
+        {"time": "2:30", "action": "Research Feudal Age with Council Hall (15 vills, 200 gold)"},
+        {"time": "3:50", "action": "Feudal Age reached. Build Longbow from Council Hall"},
+        {"time": "3:50-4:30", "action": "Transition: 4 vills to wood, rest food. Build lumber camp"},
+        {"time": "5:00", "action": "Build 2nd TC or prepare Castle transition"},
+        {"time": "5:00-7:00", "action": "Boom: continuous vills, add farms, collect gold"},
+        {"time": "7:30", "action": "Castle Age (need 1200 food, 600 gold)"}
+      ],
+      "key_metrics": {
+        "food_per_minute_at_5min": 450,
+        "gold_per_minute_at_5min": 150,
+        "military_units_at_5min": "6-8 longbows",
+        "military_units_at_10min": "15-20 longbows + MAA"
+      }
+    },
+    "longbow_rush": {
+      "name": "English Longbow Rush (Council Hall)",
+      "description": "Aggressive Feudal Age Longbow pressure, delaying opponent's economy",
+      "difficulty": "beginner-friendly",
+      "benchmarks": {
+        "feudal_age_time": "3:40-3:55",
+        "first_longbow_arrives_at_enemy": "4:30-5:00",
+        "villager_count_at_feudal": 15,
+        "villager_count_at_10min": 28,
+        "continuous_villager_production": true,
+        "max_idle_tc_time_seconds": 10
+      },
+      "build_sequence": [
+        {"time": "0:00", "action": "6 to sheep, queue vills"},
+        {"time": "0:30", "action": "7th to gold"},
+        {"time": "0:50", "action": "8th to gold"},
+        {"time": "1:00-2:00", "action": "9-15 to food"},
+        {"time": "2:20", "action": "Research Feudal (Council Hall)"},
+        {"time": "3:45", "action": "Feudal. Immediately produce Longbows"},
+        {"time": "3:45-4:00", "action": "Rally longbows to enemy base. Build barracks at home"},
+        {"time": "4:30", "action": "First 3-4 longbows arrive. Harass woodline/gold"},
+        {"time": "5:00-7:00", "action": "Continuous longbow production + vill production. Add 2nd barracks"},
+        {"time": "7:00+", "action": "Transition: add MAA or go Castle"}
+      ],
+      "key_metrics": {
+        "longbow_count_at_5min": "6-8",
+        "longbow_count_at_7min": "12-16",
+        "enemy_vills_killed_target": "3-5 by 7min",
+        "food_per_minute_at_5min": 400,
+        "military_supply_at_7min": "15-20"
+      }
+    },
+    "two_tc_boom": {
+      "name": "English 2TC Boom",
+      "description": "Economic build with quick 2nd TC for villager lead",
+      "difficulty": "intermediate",
+      "benchmarks": {
+        "feudal_age_time": "3:50-4:10",
+        "second_tc_time": "5:00-5:30",
+        "castle_age_time": "9:00-10:00",
+        "villager_count_at_feudal": 17,
+        "villager_count_at_10min": 45,
+        "continuous_villager_production": true,
+        "max_idle_tc_time_seconds": 5
+      },
+      "key_metrics": {
+        "food_per_minute_at_10min": 700,
+        "gold_per_minute_at_10min": 250,
+        "villager_lead_at_10min": "+10-15 vs 1TC opponent"
+      }
+    },
+    "stable_king_opener": {
+      "name": "English King + Stables Opener",
+      "description": "Aggressive opening using King for early map control with scouts/horsemen",
+      "difficulty": "advanced",
+      "benchmarks": {
+        "feudal_age_time": "4:00-4:20",
+        "first_horseman_time": "4:30-5:00",
+        "castle_age_time": "8:30-9:30",
+        "villager_count_at_10min": 35
+      },
+      "key_metrics": {
+        "horsemen_at_6min": "3-4",
+        "king_damage_dealt": "scout kills + map control",
+        "food_per_minute_at_5min": 400
+      }
+    }
+  },
+  "general_benchmarks": {
+    "pro_level": {
+      "rating_range": "2000+",
+      "villager_production_gap_tolerance": "< 5 seconds",
+      "feudal_age_time_range": "3:40-4:20",
+      "castle_age_time_range": "7:30-10:00",
+      "imperial_age_time_range": "14:00-18:00",
+      "apm_estimate": "100-200",
+      "max_unit_types_in_army": "2-3 (focused composition)",
+      "supply_benchmark_10min": "40-50 vills + 15-25 military",
+      "supply_benchmark_15min": "50-60 vills + 40-60 military"
+    },
+    "diamond_level": {
+      "rating_range": "1200-1500",
+      "villager_production_gap_tolerance": "< 15 seconds",
+      "feudal_age_time_range": "4:00-5:00",
+      "castle_age_time_range": "8:30-11:00",
+      "max_unit_types_in_army": "2-4",
+      "supply_benchmark_10min": "35-45 vills + 10-20 military"
+    },
+    "gold_level": {
+      "rating_range": "800-1000",
+      "villager_production_gap_tolerance": "< 30 seconds (target)",
+      "feudal_age_time_range": "4:30-6:00",
+      "castle_age_time_range": "9:00-13:00",
+      "max_unit_types_in_army": "3-6 (often too diverse)",
+      "supply_benchmark_10min": "25-35 vills + 5-15 military",
+      "common_mistakes": [
+        "Long villager idle time (TC not producing)",
+        "Late Feudal Age due to inefficient food gathering",
+        "Too many unit types (unfocused army composition)",
+        "Not scouting opponent",
+        "Floating resources (especially food/gold)",
+        "Missing blacksmith upgrades",
+        "Not using Council Hall longbows effectively"
+      ]
+    }
+  },
+  "beasty_recent_english_games": {
+    "note": "High-level metadata from Beasty's recent English games (AoE4 World API). Build order details unavailable due to sig restriction.",
+    "games": [
+      {
+        "game_id": 220640306,
+        "map": "Rocky River",
+        "duration_seconds": 1262,
+        "result": "win",
+        "opponent": "XSLeDGeHaMMeRX",
+        "opponent_rating": 1504,
+        "opponent_civ": "ayyubids",
+        "beasty_rating": 2200,
+        "twitch_vod": "https://www.twitch.tv/videos/2699449220?t=20098s"
+      },
+      {
+        "game_id": 220636344,
+        "map": "High View",
+        "duration_seconds": 1333,
+        "result": "win",
+        "opponent": "Bitcousin @TTV",
+        "opponent_rating": 1735,
+        "opponent_civ": "unknown",
+        "beasty_rating": 2194,
+        "twitch_vod": "https://www.twitch.tv/videos/2699449220?t=17886s"
+      },
+      {
+        "game_id": null,
+        "map": "Cliffside",
+        "duration_seconds": 1320,
+        "result": "win",
+        "opponent": "FünfmalViereck",
+        "opponent_rating": 1854,
+        "beasty_rating": 2216,
+        "twitch_vod": "https://www.twitch.tv/videos/2699449220?t=11907s"
+      },
+      {
+        "game_id": null,
+        "map": "Dry Arabia",
+        "duration_seconds": 1620,
+        "result": "loss",
+        "opponent": "May",
+        "opponent_rating": 2317,
+        "beasty_rating": 2236,
+        "twitch_vod": "https://www.twitch.tv/videos/2699449220?t=9839s"
+      },
+      {
+        "game_id": null,
+        "map": "Dry Arabia",
+        "duration_seconds": 1860,
+        "result": "win",
+        "opponent": "Muhodo",
+        "opponent_rating": 1939,
+        "beasty_rating": 2223,
+        "twitch_vod": "https://www.twitch.tv/videos/2699449220?t=7738s"
+      }
+    ]
+  }
+}
