@@ -10,8 +10,10 @@ Usage:
 
 import argparse
 import json
+import re
 import sys
 import urllib.request
+import urllib.parse
 import ssl
 import os
 
@@ -124,6 +126,21 @@ def extract_comparison(summary, player_id):
     return {"player": mine, "opponent": theirs}
 
 
+def parse_aoe4world_url(url):
+    """Parse an AoE4 World game URL into player_id, game_id, sig.
+    Example: https://aoe4world.com/players/8354416-EL-loueMT/games/220749753?sig=abc123
+    """
+    m = re.match(r'https?://aoe4world\.com/players/(\d+)[^/]*/games/(\d+)', url)
+    if not m:
+        return None
+    player_id = int(m.group(1))
+    game_id = int(m.group(2))
+    parsed = urllib.parse.urlparse(url)
+    qs = urllib.parse.parse_qs(parsed.query)
+    sig = qs.get("sig", [None])[0]
+    return {"player_id": player_id, "game_id": game_id, "sig": sig}
+
+
 def load_benchmarks():
     with open(BENCHMARKS_PATH) as f:
         return json.load(f)
@@ -131,6 +148,7 @@ def load_benchmarks():
 
 def main():
     parser = argparse.ArgumentParser(description="Fetch AoE4 game data")
+    parser.add_argument("--url", help="AoE4 World game URL (auto-extracts player-id, game-id, sig)")
     parser.add_argument("--player-id", type=int, help="Player profile ID")
     parser.add_argument("--game-id", type=int, help="Game ID for summary")
     parser.add_argument("--sig", help="Signature for game summary API")
@@ -142,6 +160,16 @@ def main():
     parser.add_argument("--compare", action="store_true", help="Extract both players' build orders for comparison")
     parser.add_argument("--json", action="store_true", help="Output raw JSON")
     args = parser.parse_args()
+
+    # Auto-extract from URL if provided
+    if args.url:
+        parsed = parse_aoe4world_url(args.url)
+        if not parsed:
+            print(f"Error: Could not parse URL: {args.url}", file=sys.stderr)
+            sys.exit(1)
+        args.player_id = args.player_id or parsed["player_id"]
+        args.game_id = args.game_id or parsed["game_id"]
+        args.sig = args.sig or parsed["sig"]
 
     if args.benchmarks:
         data = load_benchmarks()
