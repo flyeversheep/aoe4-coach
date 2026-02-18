@@ -1,0 +1,122 @@
+[
+  {
+    "game_id": 217892317,
+    "sig": "99139b3746d1deaeba2dfb0bacaf319d9a48bf28",
+    "url": "https://aoe4world.com/players/10307814/games/217892317?sig=99139b3746d1deaeba2dfb0bacaf319d9a48bf28",
+    "map": "Lipany",
+    "duration": 154,
+    "result": "win",
+    "rating": 1584,
+    "player_id": 10307814
+  },
+  {
+    "game_id": 217313611,
+    "sig": "52b062dbdc226b3048e1cdb7970d876e4b160db8",
+    "url": "https://aoe4world.com/players/10307814/games/217313611?sig=52b062dbdc226b3048e1cdb7970d876e4b160db8",
+    "map": "Flankwoods",
+    "duration": 1465,
+    "result": "loss",
+    "rating": 1605,
+    "player_id": 10307814
+  },
+  {
+    "game_id": 213383592,
+    "sig": "e51c38fb1b8e15133ba2a902604814786ce3f46e",
+    "url": "https://aoe4world.com/players/10307814/games/213383592?sig=e51c38fb1b8e15133ba2a902604814786ce3f46e",
+    "map": "Gorge",
+    "duration": 1077,
+    "result": "win",
+    "rating": 1442,
+    "player_id": 10307814
+  },
+  {
+    "game_id": 198252317,
+    "sig": "a3f21ab4f2098ffe2e4c749cc1f03da8edd2168b",
+    "url": "https://aoe4world.com/players/10307814/games/198252317?sig=a3f21ab4f2098ffe2e4c749cc1f03da8edd2168b",
+    "map": "Lipany",
+    "duration": 2023,
+    "result": "win",
+    "rating": 1652,
+    "player_id": 10307814
+  },
+  {
+    "game_id": 196977516,
+    "sig": "fa8154b7ee4c9e957073838eb78fcec84bc6da46",
+    "url": "https://aoe4world.com/players/10307814/games/196977516?sig=fa8154b7ee4c9e957073838eb78fcec84bc6da46",
+    "map": "Lipany",
+    "duration": 2446,
+    "result": "loss",
+    "rating": 1581,
+    "player_id": 10307814
+  },
+  {
+    "game_id": 187139595,
+    "sig": "f0ea1e00d6a5d7584bc2feb8d46dec020f8cfc55",
+    "url": "https://aoe4world.com/players/10307814/games/187139595?sig=f0ea1e00d6a5d7584bc2feb8d46dec020f8cfc55",
+    "map": "Lipany",
+    "duration": 1007,
+    "result": "loss",
+    "rating": 1423,
+    "player_id": 10307814
+  },
+  {
+    "game_id": 182576053,
+    "sig": "694a0087b8a50ff9d0de616cf474ee90eef9feae",
+    "url": "https://aoe4world.com/players/10307814/games/182576053?sig=694a0087b8a50ff9d0de616cf474ee90eef9feae",
+    "map": "Waterholes",
+    "duration": 1817,
+    "result": "win",
+    "rating": 1574,
+    "player_id": 10307814
+  },
+  {
+    "game_id": 171422366,
+    "sig": "47522ee02c1c810db355965cb44616d392ce1787",
+    "url": "https://aoe4world.com/players/10307814/games/171422366?sig=47522ee02c1c810db355965cb44616d392ce1787",
+    "map": "Lipany",
+    "duration": 1247,
+    "result": "loss",
+    "rating": 1755,
+    "player_id": 10307814
+  },
+  {
+    "game_id": 171421885,
+    "sig": "e2197f442921a56d8d36e6f2ab2e94f91983bcc9",
+    "url": "https://aoe4world.com/players/10307814/games/171421885?sig=e2197f442921a56d8d36e6f2ab2e94f91983bcc9",
+    "map": "Lipany",
+    "duration": 140,
+    "result": "win",
+    "rating": 1742,
+    "player_id": 10307814
+  },
+  {
+    "game_id": 169848338,
+    "sig": "889650621a3d51ebba3881fa3b35a2ca32af7745",
+    "url": "https://aoe4world.com/players/10307814/games/169848338?sig=889650621a3d51ebba3881fa3b35a2ca32af7745",
+    "map": "Mountain Clearing",
+    "duration": 737,
+    "result": "loss",
+    "rating": 1797,
+    "player_id": 10307814
+  },
+  {
+    "game_id": 167620480,
+    "sig": "d46db5a4d75116a7ae321497fe7f8789cf18cd1e",
+    "url": "https://aoe4world.com/players/10307814/games/167620480?sig=d46db5a4d75116a7ae321497fe7f8789cf18cd1e",
+    "map": "Mountain Clearing",
+    "duration": 1351,
+    "result": "win",
+    "rating": 1899,
+    "player_id": 10307814
+  },
+  {
+    "game_id": 167619494,
+    "sig": "86544c3c0ef4312f705dfaf3d1e9ac95f2e31011",
+    "url": "https://aoe4world.com/players/10307814/games/167619494?sig=86544c3c0ef4312f705dfaf3d1e9ac95f2e31011",
+    "map": "Lipany",
+    "duration": 154,
+    "result": "win",
+    "rating": 1889,
+    "player_id": 10307814
+  }
+]
