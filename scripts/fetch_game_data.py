@@ -141,9 +141,10 @@ def parse_aoe4world_url(url):
     return {"player_id": player_id, "game_id": game_id, "sig": sig}
 
 
-def scrape_game_sigs(player_id, player_slug=None, page=1):
+def scrape_game_sigs(player_id, player_slug=None, page=1, filter_civ=None):
     """Scrape game IDs and sigs from a player's games page on AoE4 World.
-    Only works if the player has public match history enabled."""
+    Only works if the player has public match history enabled.
+    If filter_civ is specified, enriches with civ info from API."""
     slug = player_slug or str(player_id)
     url = f"https://aoe4world.com/players/{slug}/games?page={page}"
     req = urllib.request.Request(url, headers=HEADERS)
@@ -152,7 +153,37 @@ def scrape_game_sigs(player_id, player_slug=None, page=1):
     # Extract game_id and sig pairs from href attributes
     pattern = re.compile(r'games/(\d+)\?sig=([a-f0-9]+)')
     matches = pattern.findall(html)
-    return [{"game_id": int(gid), "sig": sig} for gid, sig in matches]
+    results = [{"game_id": int(gid), "sig": sig} for gid, sig in matches]
+    
+    # If filtering by civ, fetch game details to get civ info
+    if filter_civ and results:
+        game_ids = [r["game_id"] for r in results]
+        # Fetch games from API to get civ info
+        api_url = f"{API_BASE}/players/{player_id}/games?limit=50"
+        api_data = fetch_json(api_url)
+        games_by_id = {}
+        for g in api_data.get("games", []):
+            games_by_id[g["game_id"]] = g
+        
+        filtered = []
+        for r in results:
+            gid = r["game_id"]
+            if gid in games_by_id:
+                g = games_by_id[gid]
+                for team in g.get("teams", []):
+                    for m in team:
+                        p = m.get("player", {})
+                        if p.get("profile_id") == player_id:
+                            if p.get("civilization") == filter_civ:
+                                r["civilization"] = filter_civ
+                                r["map"] = g.get("map")
+                                r["duration"] = g.get("duration")
+                                r["result"] = p.get("result")
+                                r["rating"] = p.get("rating")
+                                filtered.append(r)
+                            break
+        return filtered
+    return results
 
 
 def load_benchmarks():
@@ -174,6 +205,7 @@ def main():
     parser.add_argument("--compare", action="store_true", help="Extract both players' build orders for comparison")
     parser.add_argument("--scrape-sigs", action="store_true", help="Scrape game sigs from player's games page (requires public match history)")
     parser.add_argument("--player-slug", help="Player slug for scraping (e.g. '8354416-EL-loueMT')")
+    parser.add_argument("--filter-civ", help="Filter scraped games by civilization (e.g. 'english')")
     parser.add_argument("--json", action="store_true", help="Output raw JSON")
     args = parser.parse_args()
 
@@ -197,13 +229,14 @@ def main():
         if not slug:
             print("Error: --player-id or --player-slug required", file=sys.stderr)
             sys.exit(1)
-        sigs = scrape_game_sigs(args.player_id, slug)
+        sigs = scrape_game_sigs(args.player_id, slug, filter_civ=args.filter_civ)
         if args.json:
             print(json.dumps(sigs, indent=2))
         else:
             print(f"Found {len(sigs)} games with sigs:\n")
             for s in sigs:
-                print(f"  Game {s['game_id']} | sig={s['sig'][:12]}...")
+                extra = f" | {s.get('map', '?')} | {s.get('result', '?')} | {s.get('rating', '?')}" if args.filter_civ else ""
+                print(f"  Game {s['game_id']} | sig={s['sig'][:12]}...{extra}")
         return
 
     if args.find_refs:
