@@ -141,6 +141,20 @@ def parse_aoe4world_url(url):
     return {"player_id": player_id, "game_id": game_id, "sig": sig}
 
 
+def scrape_game_sigs(player_id, player_slug=None, page=1):
+    """Scrape game IDs and sigs from a player's games page on AoE4 World.
+    Only works if the player has public match history enabled."""
+    slug = player_slug or str(player_id)
+    url = f"https://aoe4world.com/players/{slug}/games?page={page}"
+    req = urllib.request.Request(url, headers=HEADERS)
+    with urllib.request.urlopen(req, timeout=15, context=ssl_ctx) as resp:
+        html = resp.read().decode()
+    # Extract game_id and sig pairs from href attributes
+    pattern = re.compile(r'games/(\d+)\?sig=([a-f0-9]+)')
+    matches = pattern.findall(html)
+    return [{"game_id": int(gid), "sig": sig} for gid, sig in matches]
+
+
 def load_benchmarks():
     with open(BENCHMARKS_PATH) as f:
         return json.load(f)
@@ -158,6 +172,8 @@ def main():
     parser.add_argument("--benchmarks", action="store_true", help="Print pro benchmarks")
     parser.add_argument("--find-refs", action="store_true", help="Find reference games (losses to higher-rated opponents)")
     parser.add_argument("--compare", action="store_true", help="Extract both players' build orders for comparison")
+    parser.add_argument("--scrape-sigs", action="store_true", help="Scrape game sigs from player's games page (requires public match history)")
+    parser.add_argument("--player-slug", help="Player slug for scraping (e.g. '8354416-EL-loueMT')")
     parser.add_argument("--json", action="store_true", help="Output raw JSON")
     args = parser.parse_args()
 
@@ -174,6 +190,20 @@ def main():
     if args.benchmarks:
         data = load_benchmarks()
         print(json.dumps(data, indent=2))
+        return
+
+    if args.scrape_sigs:
+        slug = args.player_slug or (str(args.player_id) if args.player_id else None)
+        if not slug:
+            print("Error: --player-id or --player-slug required", file=sys.stderr)
+            sys.exit(1)
+        sigs = scrape_game_sigs(args.player_id, slug)
+        if args.json:
+            print(json.dumps(sigs, indent=2))
+        else:
+            print(f"Found {len(sigs)} games with sigs:\n")
+            for s in sigs:
+                print(f"  Game {s['game_id']} | sig={s['sig'][:12]}...")
         return
 
     if args.find_refs:
