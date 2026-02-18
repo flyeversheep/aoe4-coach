@@ -12,16 +12,31 @@ Compare a player's game against a professional/high-rated player's game with the
 
 Pre-scraped games with sigs from players with public match history:
 
-| Player | Profile ID | Rating | Civs | English Games |
-|--------|-----------|--------|------|---------------|
-| EL.loueMT | 8354416 | 2366 | Ayyubids, Rus | 1 |
-| 燕子宇 | 11018483 | 2242 | Chinese, English | 18 |
+| Player | Profile ID | Rating Range | English Games | Wins |
+|--------|-----------|--------------|---------------|-------|
+| EL.loueMT | 8354416 | 1583-2420 | 65 | 57 |
+| 燕子宇 | 11018483 | 1278-2864 | 204 | 166 |
+| VortiX | 60328 | 1742-2376 | 73 | 63 |
+| May | 10307814 | 1423-1899 | 12 | 7 |
 
-**Reference file:** `reference_data/english_pro_games.json`
+**Reference files:**
+- Combined: `reference_data/english_pro_games.json`
+- Individual: `reference_data/english_games_{profile_id}.json`
 
 ```bash
 # View available pro games
 cat reference_data/english_pro_games.json | python3 -m json.tool | head -50
+
+# Count games by player
+python3 -c "
+import json
+with open('reference_data/english_pro_games.json') as f:
+    games = json.load(f)
+from collections import Counter
+counts = Counter(g.get('player_id') for g in games)
+for pid, count in counts.most_common():
+    print(f'Profile {pid}: {count} games')
+"
 ```
 
 ## Helper Script
