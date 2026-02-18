@@ -8,6 +8,12 @@ Compare a player's game against a professional/high-rated player's game with the
   - AoE4 World game URL for the player's game (required)
   - Optional flag `--pro <name>`: specific pro to compare against (e.g., `--pro 燕子宇`, `--pro loueMT`)
 
+**⚠️ 重要规则：**
+- 如果用户只给了 profile URL，先查询最新游戏
+- 如果无法自动获取 sig（curl 找不到），**必须问用户要完整 URL**
+- **永远不要假设**用户的 match history 不公开
+- **永远不要跳过**到旧游戏
+
 ## Available Pro Reference Data
 
 Pre-scraped games with sigs from players with public match history:
@@ -37,6 +43,21 @@ python3 scripts/fetch_game_data.py --url "<pro_game_url_with_sig>" --json
 ```
 
 ## Steps
+
+### 0. 确认游戏 URL（必须）
+
+**如果用户给了完整游戏 URL（带 sig）**：直接用。
+
+**如果用户只给了 profile URL 或没给 URL**：
+1. 查询最新游戏：`curl "https://aoe4world.com/api/v0/players/{id}/games?limit=1"`
+2. 尝试从 games 页面抓 sig
+3. **如果抓不到 → 停止，问用户**：
+   > "我找到了你最新的游戏 (Game {id})，但需要带 sig 的完整 URL 才能获取详细数据。请在 aoe4world 上点开这局游戏，把完整 URL（包含 ?sig=xxx）发给我。"
+
+**❌ 禁止行为**：
+- 禁止假设用户的 match history 不公开
+- 禁止跳到旧游戏
+- 禁止在没有 sig 的情况下继续分析
 
 ### 1. Parse Player's Game
 
