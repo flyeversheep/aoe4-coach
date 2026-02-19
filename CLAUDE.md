@@ -67,3 +67,73 @@ GET  /api/rubrics                                       — List available rubri
 4. Backend constructs prompts and calls AI provider for coaching analysis
 5. AI returns JSON coaching report; backend cleans/parses it
 6. Frontend renders results with charts and build order timelines
+
+## Rubric Library
+
+`rubric_library/` contains professional build order rubrics in JSON format. Each rubric includes:
+- `phases[]` — Dark Age, Feudal, Castle, Imperial with key_actions and timings
+- `benchmarks` — target timings (feudal_age, castle_age, villager counts)
+- `common_mistakes[]` — mistake, consequence, fix
+- `success_criteria[]` — what "good" looks like per phase
+
+Available rubrics (English civ):
+- `fast_castle_boom_english.json` — Safe economic FC build
+- `longbow_rush_standard_english_valdy.json` — Aggressive Feudal longbow
+- `longbow_rush_castle_timing_english_valdy_2026.json` — Longbow into Castle
+- `2tc_standard_english_valdy.json` — 2 TC Feudal boom
+- `2tc_white_tower_english_valdy_2026.json` — White Tower 2 TC variant
+- `stable_king_opener_english_valdy.json` — Stable King opener
+
+## Helper Scripts
+
+### `scripts/fetch_game_data.py`
+Python script to fetch game data from AoE4 World API. Handles SSL, pagination, and data formatting.
+
+```bash
+# List recent games for a player
+python3 scripts/fetch_game_data.py --player-id 17689761 --list-games --civ english --limit 5
+
+# Fetch full game summary (requires sig from AoE4 World URL)
+python3 scripts/fetch_game_data.py --player-id 17689761 --game-id 182257348 --sig <sig>
+
+# Load pro-level benchmarks
+python3 scripts/fetch_game_data.py --benchmarks
+```
+
+### `reference_data/english_pro_benchmarks.json`
+Curated pro-level English benchmarks from Beasty (2200+), community guides, and AoE4 World stats. Includes:
+- Build order templates (fast castle, longbow rush, 2TC boom, stable king opener)
+- Per-tier benchmarks (pro, diamond, gold)
+- Common mistakes by rating tier
+- Beasty's recent English game metadata with Twitch VOD links
+
+**Note:** AoE4 World's game summary API requires a `sig` parameter (server-side HMAC). Only the player's own games are accessible via sig from the profile URL. Pro player build order details require watching their Twitch VODs.
+
+## Claude Code Coaching Commands
+
+Custom slash commands in `.claude/commands/`:
+
+- `/analyze-build-order` — Compare a player's game against a pro rubric. Fetches game data from AoE4 World API, parses build order, and generates detailed coaching feedback.
+- `/compare-with-pro` — Compare a player's game against a higher-ranked player's game with the same civ. Optionally specify a pro with `--pro Beasty`. Auto-finds reference games 1-2 tiers above.
+
+### Player Info
+
+- **Primary player:** flyeversheep (Profile ID: 17689761)
+- **AoE4 World profile:** https://aoe4world.com/players/17689761
+
+## AoE4 Domain Knowledge
+
+### Key Metrics for Coaching
+- **Age-up timings** — Feudal (optimal ~5:00), Castle (~13:00), Imperial (~25:00)
+- **Villager production** — Zero TC idle time is the #1 priority for low-mid ELO
+- **APM** — Effective actions matter more than raw APM. Gold/Plat avg 50-100, Diamond+ 150+
+- **Resource balance** — Food/Wood/Gold allocation should match strategy
+- **Build order adherence** — How closely execution matches the intended strategy
+
+### Common Weakness Patterns
+- TC idle time (villager production gaps)
+- Late age-ups (resource floating or wrong allocation)
+- Population blocked (forgetting houses)
+- No scouting (blind to enemy strategy)
+- Over-committing to one plan (not adapting)
+- Resource floating (>500 unspent resources)

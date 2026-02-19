@@ -1,0 +1,732 @@
+[
+  {
+    "game_id": 205092093,
+    "sig": "fbcdd1bc1dd98a6d0cda878c0e2d2d979afe992b",
+    "url": "https://aoe4world.com/players/60328/games/205092093?sig=fbcdd1bc1dd98a6d0cda878c0e2d2d979afe992b",
+    "map": "Cliffside",
+    "duration": 1179,
+    "result": "win",
+    "rating": 2189,
+    "player_id": 60328
+  },
+  {
+    "game_id": 203248909,
+    "sig": "a76bd7a460a1ff53141c66b1a0060a5014eba112",
+    "url": "https://aoe4world.com/players/60328/games/203248909?sig=a76bd7a460a1ff53141c66b1a0060a5014eba112",
+    "map": "Relic River",
+    "duration": 1016,
+    "result": "win",
+    "rating": null,
+    "player_id": 60328
+  },
+  {
+    "game_id": 203245123,
+    "sig": "beb367531cad6df14f67a860b2c4355e6c0767b3",
+    "url": "https://aoe4world.com/players/60328/games/203245123?sig=beb367531cad6df14f67a860b2c4355e6c0767b3",
+    "map": "Sunkenlands",
+    "duration": 1249,
+    "result": "win",
+    "rating": null,
+    "player_id": 60328
+  },
+  {
+    "game_id": 203243386,
+    "sig": "521c82253b67d5a100af29df76b574414a0c926c",
+    "url": "https://aoe4world.com/players/60328/games/203243386?sig=521c82253b67d5a100af29df76b574414a0c926c",
+    "map": "Cliffside",
+    "duration": 572,
+    "result": "win",
+    "rating": null,
+    "player_id": 60328
+  },
+  {
+    "game_id": 202736619,
+    "sig": "0b2149171696ea15cf9f56907f3b5026cccd1975",
+    "url": "https://aoe4world.com/players/60328/games/202736619?sig=0b2149171696ea15cf9f56907f3b5026cccd1975",
+    "map": "Archipelago",
+    "duration": 757,
+    "result": "win",
+    "rating": 2158,
+    "player_id": 60328
+  },
+  {
+    "game_id": 202023878,
+    "sig": "6fad5eed659815db9ef3314dd314aceac049ea82",
+    "url": "https://aoe4world.com/players/60328/games/202023878?sig=6fad5eed659815db9ef3314dd314aceac049ea82",
+    "map": "Dry Arabia",
+    "duration": 637,
+    "result": "win",
+    "rating": 2146,
+    "player_id": 60328
+  },
+  {
+    "game_id": 202014110,
+    "sig": "e217b8309a480b99c6f9b202f53c32ad32dceefc",
+    "url": "https://aoe4world.com/players/60328/games/202014110?sig=e217b8309a480b99c6f9b202f53c32ad32dceefc",
+    "map": "Dry Arabia",
+    "duration": 1639,
+    "result": "win",
+    "rating": 2133,
+    "player_id": 60328
+  },
+  {
+    "game_id": 201752727,
+    "sig": "0d936d6be574e3c3c8430886399cf010d5e487df",
+    "url": "https://aoe4world.com/players/60328/games/201752727?sig=0d936d6be574e3c3c8430886399cf010d5e487df",
+    "map": "Dry Arabia",
+    "duration": 1326,
+    "result": "win",
+    "rating": 2081,
+    "player_id": 60328
+  },
+  {
+    "game_id": 189299123,
+    "sig": "7633fd074759838be6295d5bc7cec299cbec3a5f",
+    "url": "https://aoe4world.com/players/60328/games/189299123?sig=7633fd074759838be6295d5bc7cec299cbec3a5f",
+    "map": "Gorge",
+    "duration": 992,
+    "result": "win",
+    "rating": 2126,
+    "player_id": 60328
+  },
+  {
+    "game_id": 178546900,
+    "sig": "25190280dc12baddbcbd12cc358e360d5bcedd0d",
+    "url": "https://aoe4world.com/players/60328/games/178546900?sig=25190280dc12baddbcbd12cc358e360d5bcedd0d",
+    "map": "Gorge",
+    "duration": 2357,
+    "result": "win",
+    "rating": 2219,
+    "player_id": 60328
+  },
+  {
+    "game_id": 175105425,
+    "sig": "205f5c601a9e522a20e1b08ff6bebdb646af3d8b",
+    "url": "https://aoe4world.com/players/60328/games/175105425?sig=205f5c601a9e522a20e1b08ff6bebdb646af3d8b",
+    "map": "Carmel",
+    "duration": 2573,
+    "result": "loss",
+    "rating": 2215,
+    "player_id": 60328
+  },
+  {
+    "game_id": 166840679,
+    "sig": "a15c319e2068713272c3fa8d775fa7e527cc0175",
+    "url": "https://aoe4world.com/players/60328/games/166840679?sig=a15c319e2068713272c3fa8d775fa7e527cc0175",
+    "map": "Himeyama",
+    "duration": 2157,
+    "result": "loss",
+    "rating": 2278,
+    "player_id": 60328
+  },
+  {
+    "game_id": 166309362,
+    "sig": "9f3ac8e76ffb30a72c67ea7459e9c784ebefe9bf",
+    "url": "https://aoe4world.com/players/60328/games/166309362?sig=9f3ac8e76ffb30a72c67ea7459e9c784ebefe9bf",
+    "map": "Cliffside",
+    "duration": 885,
+    "result": "win",
+    "rating": 2334,
+    "player_id": 60328
+  },
+  {
+    "game_id": 166161214,
+    "sig": "f8dcaf56c7c7e06692f50aea9867d5b516039ef9",
+    "url": "https://aoe4world.com/players/60328/games/166161214?sig=f8dcaf56c7c7e06692f50aea9867d5b516039ef9",
+    "map": "Lipany",
+    "duration": 1158,
+    "result": "win",
+    "rating": 2331,
+    "player_id": 60328
+  },
+  {
+    "game_id": 166145224,
+    "sig": "83a360388d11eeabbba4f87e6e32c1c32873aef1",
+    "url": "https://aoe4world.com/players/60328/games/166145224?sig=83a360388d11eeabbba4f87e6e32c1c32873aef1",
+    "map": "Lakeside",
+    "duration": 49,
+    "result": "win",
+    "rating": 2323,
+    "player_id": 60328
+  },
+  {
+    "game_id": 165652650,
+    "sig": "d787416f3f64f8fbecf0eb1deac40852748153d4",
+    "url": "https://aoe4world.com/players/60328/games/165652650?sig=d787416f3f64f8fbecf0eb1deac40852748153d4",
+    "map": "Himeyama",
+    "duration": 1210,
+    "result": "win",
+    "rating": 2309,
+    "player_id": 60328
+  },
+  {
+    "game_id": 165515781,
+    "sig": "fe276215e036c3c3f99ae9aca0132d8a713a8418",
+    "url": "https://aoe4world.com/players/60328/games/165515781?sig=fe276215e036c3c3f99ae9aca0132d8a713a8418",
+    "map": "Gorge",
+    "duration": 2362,
+    "result": "win",
+    "rating": 2301,
+    "player_id": 60328
+  },
+  {
+    "game_id": 165378154,
+    "sig": "aca615a7a8bee739c35d90e6f15963a2645293a8",
+    "url": "https://aoe4world.com/players/60328/games/165378154?sig=aca615a7a8bee739c35d90e6f15963a2645293a8",
+    "map": "Lipany",
+    "duration": 1425,
+    "result": "win",
+    "rating": 2350,
+    "player_id": 60328
+  },
+  {
+    "game_id": 165252211,
+    "sig": "860b1d5659d71741db540b52155e621b3aed7a2a",
+    "url": "https://aoe4world.com/players/60328/games/165252211?sig=860b1d5659d71741db540b52155e621b3aed7a2a",
+    "map": "Himeyama",
+    "duration": 2321,
+    "result": "win",
+    "rating": 2316,
+    "player_id": 60328
+  },
+  {
+    "game_id": 164671191,
+    "sig": "f82035f13c8d2bb3ee0ad470717221aa45955fa9",
+    "url": "https://aoe4world.com/players/60328/games/164671191?sig=f82035f13c8d2bb3ee0ad470717221aa45955fa9",
+    "map": "Dry Arabia",
+    "duration": 792,
+    "result": "win",
+    "rating": 2309,
+    "player_id": 60328
+  },
+  {
+    "game_id": 162608628,
+    "sig": "f90af73723e451864d79da05ae9c7b474c191a28",
+    "url": "https://aoe4world.com/players/60328/games/162608628?sig=f90af73723e451864d79da05ae9c7b474c191a28",
+    "map": "Hill and Dale",
+    "duration": 2466,
+    "result": "loss",
+    "rating": 2308,
+    "player_id": 60328
+  },
+  {
+    "game_id": 161798623,
+    "sig": "db0bd44d465ff1594c3e4fd05f6b2f85b5b01a75",
+    "url": "https://aoe4world.com/players/60328/games/161798623?sig=db0bd44d465ff1594c3e4fd05f6b2f85b5b01a75",
+    "map": "Himeyama",
+    "duration": 1707,
+    "result": "win",
+    "rating": 2277,
+    "player_id": 60328
+  },
+  {
+    "game_id": 161026884,
+    "sig": "58e2b521051c61d6fd5d2381d18795c473afe0f9",
+    "url": "https://aoe4world.com/players/60328/games/161026884?sig=58e2b521051c61d6fd5d2381d18795c473afe0f9",
+    "map": "Gorge",
+    "duration": 2121,
+    "result": "win",
+    "rating": 2287,
+    "player_id": 60328
+  },
+  {
+    "game_id": 161020008,
+    "sig": "2e50ed34b58da73acacf4cf452827f6b47d4ba18",
+    "url": "https://aoe4world.com/players/60328/games/161020008?sig=2e50ed34b58da73acacf4cf452827f6b47d4ba18",
+    "map": "Hill and Dale",
+    "duration": 1369,
+    "result": "win",
+    "rating": 2284,
+    "player_id": 60328
+  },
+  {
+    "game_id": 160780805,
+    "sig": "c4d3d1598ede5a50b7193b43d04a95c8b3293d5f",
+    "url": "https://aoe4world.com/players/60328/games/160780805?sig=c4d3d1598ede5a50b7193b43d04a95c8b3293d5f",
+    "map": "Himeyama",
+    "duration": 1509,
+    "result": "win",
+    "rating": 2219,
+    "player_id": 60328
+  },
+  {
+    "game_id": 160666399,
+    "sig": "c23f0597bfad455c319f2137bfd8fa26c7cccc75",
+    "url": "https://aoe4world.com/players/60328/games/160666399?sig=c23f0597bfad455c319f2137bfd8fa26c7cccc75",
+    "map": "Himeyama",
+    "duration": 1103,
+    "result": "win",
+    "rating": 2215,
+    "player_id": 60328
+  },
+  {
+    "game_id": 160103282,
+    "sig": "8a98cd551d0032f9874c639c080ca8233b596892",
+    "url": "https://aoe4world.com/players/60328/games/160103282?sig=8a98cd551d0032f9874c639c080ca8233b596892",
+    "map": "Gorge",
+    "duration": 704,
+    "result": "loss",
+    "rating": 2223,
+    "player_id": 60328
+  },
+  {
+    "game_id": 160084917,
+    "sig": "2439010fccbe7b1dc1c253460da9eba85f6eaa59",
+    "url": "https://aoe4world.com/players/60328/games/160084917?sig=2439010fccbe7b1dc1c253460da9eba85f6eaa59",
+    "map": "Himeyama",
+    "duration": 1282,
+    "result": "win",
+    "rating": 2230,
+    "player_id": 60328
+  },
+  {
+    "game_id": 159787768,
+    "sig": "8a8bc977bd6cf9eabd21aa290b0ac81043119b72",
+    "url": "https://aoe4world.com/players/60328/games/159787768?sig=8a8bc977bd6cf9eabd21aa290b0ac81043119b72",
+    "map": "Dry Arabia",
+    "duration": 1610,
+    "result": "loss",
+    "rating": 2124,
+    "player_id": 60328
+  },
+  {
+    "game_id": 158951980,
+    "sig": "7cd3bee6a56dd1c96bce41f2fbe702345180cd9f",
+    "url": "https://aoe4world.com/players/60328/games/158951980?sig=7cd3bee6a56dd1c96bce41f2fbe702345180cd9f",
+    "map": "Gorge",
+    "duration": 593,
+    "result": "loss",
+    "rating": 2149,
+    "player_id": 60328
+  },
+  {
+    "game_id": 157334614,
+    "sig": "17e5dfa3e633843408fef96faaac8e8715929056",
+    "url": "https://aoe4world.com/players/60328/games/157334614?sig=17e5dfa3e633843408fef96faaac8e8715929056",
+    "map": "Gorge",
+    "duration": 1421,
+    "result": "win",
+    "rating": 2115,
+    "player_id": 60328
+  },
+  {
+    "game_id": 156985716,
+    "sig": "6d992e511e05eabaa8ef8a0c8df2f114e06a464b",
+    "url": "https://aoe4world.com/players/60328/games/156985716?sig=6d992e511e05eabaa8ef8a0c8df2f114e06a464b",
+    "map": "Himeyama",
+    "duration": 862,
+    "result": "win",
+    "rating": 1999,
+    "player_id": 60328
+  },
+  {
+    "game_id": 156882780,
+    "sig": "0e15f735201bdfa345016833c4d45d3bc18bc454",
+    "url": "https://aoe4world.com/players/60328/games/156882780?sig=0e15f735201bdfa345016833c4d45d3bc18bc454",
+    "map": "Gorge",
+    "duration": 1509,
+    "result": "win",
+    "rating": 1986,
+    "player_id": 60328
+  },
+  {
+    "game_id": 156878469,
+    "sig": "af2663394e726f1177f8dee663a887049b8fe0f3",
+    "url": "https://aoe4world.com/players/60328/games/156878469?sig=af2663394e726f1177f8dee663a887049b8fe0f3",
+    "map": "Himeyama",
+    "duration": 1316,
+    "result": "win",
+    "rating": 1989,
+    "player_id": 60328
+  },
+  {
+    "game_id": 155995425,
+    "sig": "eb68dfbcb9774fff42f74fc197db45f65a69be4a",
+    "url": "https://aoe4world.com/players/60328/games/155995425?sig=eb68dfbcb9774fff42f74fc197db45f65a69be4a",
+    "map": "Dry Arabia",
+    "duration": 1098,
+    "result": "win",
+    "rating": 1939,
+    "player_id": 60328
+  },
+  {
+    "game_id": 155992815,
+    "sig": "3a6188f7e10c0c2e67878a611ac4a64e8054eaa1",
+    "url": "https://aoe4world.com/players/60328/games/155992815?sig=3a6188f7e10c0c2e67878a611ac4a64e8054eaa1",
+    "map": "Himeyama",
+    "duration": 1164,
+    "result": "loss",
+    "rating": 1966,
+    "player_id": 60328
+  },
+  {
+    "game_id": 155978684,
+    "sig": "d60b976ee9c27967895be0fd8bfd2fda415b34c6",
+    "url": "https://aoe4world.com/players/60328/games/155978684?sig=d60b976ee9c27967895be0fd8bfd2fda415b34c6",
+    "map": "Hill and Dale",
+    "duration": 1436,
+    "result": "win",
+    "rating": 2010,
+    "player_id": 60328
+  },
+  {
+    "game_id": 154538200,
+    "sig": "e569e2616daeaded2eba2a333ba00cf6c7537827",
+    "url": "https://aoe4world.com/players/60328/games/154538200?sig=e569e2616daeaded2eba2a333ba00cf6c7537827",
+    "map": "Four Lakes",
+    "duration": 1042,
+    "result": "win",
+    "rating": 1959,
+    "player_id": 60328
+  },
+  {
+    "game_id": 154426825,
+    "sig": "c32c913c41cae6b1a041f2b139062410a5e3c94c",
+    "url": "https://aoe4world.com/players/60328/games/154426825?sig=c32c913c41cae6b1a041f2b139062410a5e3c94c",
+    "map": "Gorge",
+    "duration": 736,
+    "result": "win",
+    "rating": 1914,
+    "player_id": 60328
+  },
+  {
+    "game_id": 154293158,
+    "sig": "50538b0050257d33780dc9fdd463b964a26f30e5",
+    "url": "https://aoe4world.com/players/60328/games/154293158?sig=50538b0050257d33780dc9fdd463b964a26f30e5",
+    "map": "Himeyama",
+    "duration": 1525,
+    "result": "win",
+    "rating": 1742,
+    "player_id": 60328
+  },
+  {
+    "game_id": 154177662,
+    "sig": "4a6a85beacda37070c4171c3ac977642524afc53",
+    "url": "https://aoe4world.com/players/60328/games/154177662?sig=4a6a85beacda37070c4171c3ac977642524afc53",
+    "map": "Marshland",
+    "duration": 1456,
+    "result": "win",
+    "rating": null,
+    "player_id": 60328
+  },
+  {
+    "game_id": 131930161,
+    "sig": "5a554c16b496da4f152be9cc4df783bfe072a23b",
+    "url": "https://aoe4world.com/players/60328/games/131930161?sig=5a554c16b496da4f152be9cc4df783bfe072a23b",
+    "map": "Gorge",
+    "duration": 387,
+    "result": "win",
+    "rating": null,
+    "player_id": 60328
+  },
+  {
+    "game_id": 131909197,
+    "sig": "033a3c4504e3d1e64b53f4b49bbfc1619af335aa",
+    "url": "https://aoe4world.com/players/60328/games/131909197?sig=033a3c4504e3d1e64b53f4b49bbfc1619af335aa",
+    "map": "High View",
+    "duration": 1142,
+    "result": "win",
+    "rating": 2003,
+    "player_id": 60328
+  },
+  {
+    "game_id": 128834365,
+    "sig": "e8f91dc5c4486cdd01ccb49e6184a428798e5290",
+    "url": "https://aoe4world.com/players/60328/games/128834365?sig=e8f91dc5c4486cdd01ccb49e6184a428798e5290",
+    "map": "Lipany",
+    "duration": 2328,
+    "result": "win",
+    "rating": 1969,
+    "player_id": 60328
+  },
+  {
+    "game_id": 126010544,
+    "sig": "26e29712b93635eb4df91dc5a98ef03e1cbaf1ff",
+    "url": "https://aoe4world.com/players/60328/games/126010544?sig=26e29712b93635eb4df91dc5a98ef03e1cbaf1ff",
+    "map": "Lipany",
+    "duration": 766,
+    "result": "win",
+    "rating": 1958,
+    "player_id": 60328
+  },
+  {
+    "game_id": 122161467,
+    "sig": "4f3c4935700f27b9f3726a1c05582d39026c9a94",
+    "url": "https://aoe4world.com/players/60328/games/122161467?sig=4f3c4935700f27b9f3726a1c05582d39026c9a94",
+    "map": "Cliffside",
+    "duration": 1053,
+    "result": "loss",
+    "rating": 1881,
+    "player_id": 60328
+  },
+  {
+    "game_id": 122158467,
+    "sig": "88a15689c581d17eeebeaf38a151356c9d41a468",
+    "url": "https://aoe4world.com/players/60328/games/122158467?sig=88a15689c581d17eeebeaf38a151356c9d41a468",
+    "map": "Cliffside",
+    "duration": 914,
+    "result": "win",
+    "rating": 1845,
+    "player_id": 60328
+  },
+  {
+    "game_id": 106242530,
+    "sig": "9e2866113c9f6225b790adf2a0b03e078816f59e",
+    "url": "https://aoe4world.com/players/60328/games/106242530?sig=9e2866113c9f6225b790adf2a0b03e078816f59e",
+    "map": "Himeyama",
+    "duration": 1378,
+    "result": "win",
+    "rating": 2229,
+    "player_id": 60328
+  },
+  {
+    "game_id": 105007976,
+    "sig": "66f27072f28c815e61c171b5f495fee4edf69657",
+    "url": "https://aoe4world.com/players/60328/games/105007976?sig=66f27072f28c815e61c171b5f495fee4edf69657",
+    "map": "Himeyama",
+    "duration": 438,
+    "result": "win",
+    "rating": 2216,
+    "player_id": 60328
+  },
+  {
+    "game_id": 103705691,
+    "sig": "9ddf837842b2adb0421af812b4add61c398323da",
+    "url": "https://aoe4world.com/players/60328/games/103705691?sig=9ddf837842b2adb0421af812b4add61c398323da",
+    "map": "Rocky River",
+    "duration": 1830,
+    "result": "loss",
+    "rating": 2206,
+    "player_id": 60328
+  },
+  {
+    "game_id": 103696511,
+    "sig": "52f4282ab42b8730705857487bf4a10172995ee8",
+    "url": "https://aoe4world.com/players/60328/games/103696511?sig=52f4282ab42b8730705857487bf4a10172995ee8",
+    "map": "Himeyama",
+    "duration": 1667,
+    "result": "win",
+    "rating": 2186,
+    "player_id": 60328
+  },
+  {
+    "game_id": 103049801,
+    "sig": "2629ca4853bf59a72585a27bbb7458a5285a2649",
+    "url": "https://aoe4world.com/players/60328/games/103049801?sig=2629ca4853bf59a72585a27bbb7458a5285a2649",
+    "map": "Cliffside",
+    "duration": 729,
+    "result": "win",
+    "rating": 2209,
+    "player_id": 60328
+  },
+  {
+    "game_id": 96459634,
+    "sig": "d89677e39bdae0f1b38b675dd897ea8fcb32ada5",
+    "url": "https://aoe4world.com/players/60328/games/96459634?sig=d89677e39bdae0f1b38b675dd897ea8fcb32ada5",
+    "map": "Cliffside",
+    "duration": 493,
+    "result": "win",
+    "rating": 2053,
+    "player_id": 60328
+  },
+  {
+    "game_id": 92903879,
+    "sig": "dfa4002dcdfdec5631803f2f5e79a1ec1b128835",
+    "url": "https://aoe4world.com/players/60328/games/92903879?sig=dfa4002dcdfdec5631803f2f5e79a1ec1b128835",
+    "map": "Hill and Dale",
+    "duration": 2035,
+    "result": "win",
+    "rating": 2356,
+    "player_id": 60328
+  },
+  {
+    "game_id": 89778624,
+    "sig": "1c39415d052e15fec0e26ce63d24d31375fb427b",
+    "url": "https://aoe4world.com/players/60328/games/89778624?sig=1c39415d052e15fec0e26ce63d24d31375fb427b",
+    "map": "Hill and Dale",
+    "duration": 525,
+    "result": "win",
+    "rating": 2315,
+    "player_id": 60328
+  },
+  {
+    "game_id": 85597950,
+    "sig": "7778c9e8287fc18b8349933134eaf2873c18afb1",
+    "url": "https://aoe4world.com/players/60328/games/85597950?sig=7778c9e8287fc18b8349933134eaf2873c18afb1",
+    "map": "The Pit",
+    "duration": 1076,
+    "result": "win",
+    "rating": 2353,
+    "player_id": 60328
+  },
+  {
+    "game_id": 84052988,
+    "sig": "6bd6a5b89accafaff6a6e5c923a294f016c86432",
+    "url": "https://aoe4world.com/players/60328/games/84052988?sig=6bd6a5b89accafaff6a6e5c923a294f016c86432",
+    "map": "Hill and Dale",
+    "duration": 892,
+    "result": "loss",
+    "rating": 2356,
+    "player_id": 60328
+  },
+  {
+    "game_id": 83177428,
+    "sig": "da4f860b0e27276436edc658af64cf143edfd492",
+    "url": "https://aoe4world.com/players/60328/games/83177428?sig=da4f860b0e27276436edc658af64cf143edfd492",
+    "map": "Marshland",
+    "duration": 474,
+    "result": "win",
+    "rating": 2348,
+    "player_id": 60328
+  },
+  {
+    "game_id": 83173103,
+    "sig": "1fa62a2cbf26fa84629c066e0abb65f551f458d8",
+    "url": "https://aoe4world.com/players/60328/games/83173103?sig=1fa62a2cbf26fa84629c066e0abb65f551f458d8",
+    "map": "Hill and Dale",
+    "duration": 938,
+    "result": "win",
+    "rating": 2345,
+    "player_id": 60328
+  },
+  {
+    "game_id": 81353593,
+    "sig": "3505aa50617f12734a94b8012320e432305af7a4",
+    "url": "https://aoe4world.com/players/60328/games/81353593?sig=3505aa50617f12734a94b8012320e432305af7a4",
+    "map": "High View",
+    "duration": 998,
+    "result": "win",
+    "rating": 2376,
+    "player_id": 60328
+  },
+  {
+    "game_id": 81167636,
+    "sig": "8c5a17e50bf9ab88073b4bf69c37fc964da433bd",
+    "url": "https://aoe4world.com/players/60328/games/81167636?sig=8c5a17e50bf9ab88073b4bf69c37fc964da433bd",
+    "map": "Marshland",
+    "duration": 1128,
+    "result": "win",
+    "rating": 2343,
+    "player_id": 60328
+  },
+  {
+    "game_id": 80934838,
+    "sig": "debe044e4e215f1a7f9de591c5b3d0d7047c164b",
+    "url": "https://aoe4world.com/players/60328/games/80934838?sig=debe044e4e215f1a7f9de591c5b3d0d7047c164b",
+    "map": "Marshland",
+    "duration": 1013,
+    "result": "win",
+    "rating": 2235,
+    "player_id": 60328
+  },
+  {
+    "game_id": 80836044,
+    "sig": "3f1ffc64a0cf9a985898cd60408c37e2ada8d19e",
+    "url": "https://aoe4world.com/players/60328/games/80836044?sig=3f1ffc64a0cf9a985898cd60408c37e2ada8d19e",
+    "map": "Dry Arabia",
+    "duration": 2010,
+    "result": "win",
+    "rating": 2192,
+    "player_id": 60328
+  },
+  {
+    "game_id": 80835087,
+    "sig": "7d79e0b0d72dbc7876812b351fc994fb963a6fe7",
+    "url": "https://aoe4world.com/players/60328/games/80835087?sig=7d79e0b0d72dbc7876812b351fc994fb963a6fe7",
+    "map": "The Pit",
+    "duration": 708,
+    "result": "win",
+    "rating": 2181,
+    "player_id": 60328
+  },
+  {
+    "game_id": 80741268,
+    "sig": "09629e7f3115546b29ee84f43bb7819b5a842acb",
+    "url": "https://aoe4world.com/players/60328/games/80741268?sig=09629e7f3115546b29ee84f43bb7819b5a842acb",
+    "map": "Marshland",
+    "duration": 1038,
+    "result": "win",
+    "rating": 2153,
+    "player_id": 60328
+  },
+  {
+    "game_id": 80487141,
+    "sig": "ce711a884fef8070e907fdc844b956b30829be9b",
+    "url": "https://aoe4world.com/players/60328/games/80487141?sig=ce711a884fef8070e907fdc844b956b30829be9b",
+    "map": "The Pit",
+    "duration": 846,
+    "result": "win",
+    "rating": 2159,
+    "player_id": 60328
+  },
+  {
+    "game_id": 79128136,
+    "sig": "7c13e365f1d1e078b89c780c7b66c38e0f0a2ffa",
+    "url": "https://aoe4world.com/players/60328/games/79128136?sig=7c13e365f1d1e078b89c780c7b66c38e0f0a2ffa",
+    "map": "Dry Arabia",
+    "duration": 785,
+    "result": "win",
+    "rating": 2195,
+    "player_id": 60328
+  },
+  {
+    "game_id": 79032732,
+    "sig": "8fd299b3b6c14a63f912462d6b59dd2745d46141",
+    "url": "https://aoe4world.com/players/60328/games/79032732?sig=8fd299b3b6c14a63f912462d6b59dd2745d46141",
+    "map": "High View",
+    "duration": 937,
+    "result": "win",
+    "rating": 2174,
+    "player_id": 60328
+  },
+  {
+    "game_id": 78926111,
+    "sig": "63389fbaf0a324d7a8c7ab6aa9786a2f29088cd6",
+    "url": "https://aoe4world.com/players/60328/games/78926111?sig=63389fbaf0a324d7a8c7ab6aa9786a2f29088cd6",
+    "map": "Dry Arabia",
+    "duration": 1079,
+    "result": "win",
+    "rating": 2166,
+    "player_id": 60328
+  },
+  {
+    "game_id": 74247783,
+    "sig": "e0fbe6ff234d060317890272052ee8ddaaf261d2",
+    "url": "https://aoe4world.com/players/60328/games/74247783?sig=e0fbe6ff234d060317890272052ee8ddaaf261d2",
+    "map": "High View",
+    "duration": 1870,
+    "result": "win",
+    "rating": 2335,
+    "player_id": 60328
+  },
+  {
+    "game_id": 74242553,
+    "sig": "78833679c3cf4a64684e55bac4f8d3003afd481b",
+    "url": "https://aoe4world.com/players/60328/games/74242553?sig=78833679c3cf4a64684e55bac4f8d3003afd481b",
+    "map": "High View",
+    "duration": 37,
+    "result": "win",
+    "rating": 2312,
+    "player_id": 60328
+  },
+  {
+    "game_id": 74160109,
+    "sig": "72c0bfb85d51e311cc14adbd790725e958a081d9",
+    "url": "https://aoe4world.com/players/60328/games/74160109?sig=72c0bfb85d51e311cc14adbd790725e958a081d9",
+    "map": "Prairie",
+    "duration": 716,
+    "result": "win",
+    "rating": 2304,
+    "player_id": 60328
+  },
+  {
+    "game_id": 74068699,
+    "sig": "de15a308d7eb3960fb7f7d4535bb4699b9d3a457",
+    "url": "https://aoe4world.com/players/60328/games/74068699?sig=de15a308d7eb3960fb7f7d4535bb4699b9d3a457",
+    "map": "Dry Arabia",
+    "duration": 1588,
+    "result": "win",
+    "rating": 2260,
+    "player_id": 60328
+  }
+]
